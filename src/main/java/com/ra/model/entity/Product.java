@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -18,12 +19,14 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
     private String description;
     private String image;
     private String productName;
     private String sku;
     private boolean status;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate updatedAt;
     private Long brandId;
     @ManyToOne

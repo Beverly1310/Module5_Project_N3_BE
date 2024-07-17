@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ManyToAny;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -25,6 +26,7 @@ public class Orders {
     private String note;
     private String phone;
     private String province;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate receiveAt;
     private String serialNumber;
     @Enumerated(EnumType.STRING)

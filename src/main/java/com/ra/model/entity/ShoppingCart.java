@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -18,7 +19,11 @@ public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToMany
-    @JoinColumn(name = "cart_id",referencedColumnName = "id")
-    private List<CartItem> cartItems;
+    private Long quantity;
+    @ManyToOne
+    @JoinColumn(name = "product_detail_id", referencedColumnName = "id")
+    private ProductDetail productDetail;
+    @ManyToOne
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    private User user;
 }
