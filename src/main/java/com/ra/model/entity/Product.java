@@ -28,7 +28,9 @@ public class Product {
     private boolean status;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate updatedAt;
-    private Long brandId;
+    @ManyToOne
+    @JoinColumn(name = "brand_id",referencedColumnName = "id")
+    private Brand brand;
     @ManyToOne
     @JoinColumn(name = "category_Id", referencedColumnName = "id")
     private Category category;
