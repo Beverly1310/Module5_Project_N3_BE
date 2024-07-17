@@ -32,6 +32,7 @@ public class CustomUserDetailService implements UserDetailsService {
                 .phone(user.getPhone())
                 .status(user.getStatus())
                 .avatar(user.getAvatar())
+                .point(user.getPoint())
                 .authorities(functionConvertRoleToGrandAuthorities(user.getRoles()))
                 .build();
 

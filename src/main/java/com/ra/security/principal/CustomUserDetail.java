@@ -37,7 +37,7 @@ public class CustomUserDetail implements UserDetails {
     private Date createdAt=new Date();
 
     private Date updatedAt=new Date();
-
+    private Double point;
     private Boolean isDeleted=false;
     private Collection<? extends GrantedAuthority> authorities;
 
