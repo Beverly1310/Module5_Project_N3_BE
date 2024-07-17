@@ -1,4 +1,4 @@
-package com.ra.Advice;
+package com.ra.advice;
 
 
 import com.ra.model.dto.res.DataError;
