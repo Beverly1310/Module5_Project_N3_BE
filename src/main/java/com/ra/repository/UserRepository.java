@@ -15,4 +15,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, PagingAndSortingRepository<User, Long> {
     Optional<User> findUserByUsername(String username);
+    @Query("SELECT u FROM User u")
+    Page<User> getAll(Pageable pageable);
 }
