@@ -41,9 +41,15 @@ public class AdminServiceImpl implements AdminService {
     }
     @Override
     public User changStatus(Long id) {
-        if (userRepository.existsById(id)) {
-            userRepository.updateQueryChangeStatus(id);
-           return findById(id);
+        User user =findById(id);
+        if (user!=null) {
+            if (user.getRoles().stream().anyMatch(role -> role.getRoleName()==RoleName.ADMIN)) {
+                throw new RuntimeException("You can not block Admin");
+            }
+            else {
+                userRepository.updateQueryChangeStatus(id);
+                return findById(id);
+            }
         }
         else {
             throw new NoSuchElementException("User not found");
