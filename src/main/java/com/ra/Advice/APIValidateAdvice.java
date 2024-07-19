@@ -37,7 +37,7 @@ public class APIValidateAdvice {
         return new DataError<>("Error",e.getLocalizedMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
     @ExceptionHandler(RuntimeException.class)
-    public DataError<?> handleRuntimeException(RuntimeException e){
-        return new DataError<>("Error",e.getLocalizedMessage(),HttpStatus.BAD_REQUEST);
+    public ResponseEntity<DataError<?>>  handleRuntimeException(RuntimeException e){
+        return new ResponseEntity<>(new DataError<>("Error",e.getLocalizedMessage(),HttpStatus.BAD_REQUEST),HttpStatus.BAD_REQUEST);
     }
 }
