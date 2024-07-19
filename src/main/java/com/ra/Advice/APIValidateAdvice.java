@@ -4,6 +4,7 @@ package com.ra.advice;
 import com.ra.model.dto.res.DataError;
 import org.hibernate.exception.DataException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,14 +15,17 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class APIValidateAdvice {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public DataError<Map<String,String>> handleMethodArgument(MethodArgumentNotValidException ex){
+    public ResponseEntity<DataError<Map<String,String>>> handleMethodArgument(MethodArgumentNotValidException ex){
         Map<String,String> map = new HashMap<>();
         for (int i = 0; i < ex.getFieldErrors().size(); i++) {
             FieldError error = ex.getFieldErrors().get(i);
             map.put(error.getField(), error.getDefaultMessage());
         }
-        return new DataError<>("Errors",map, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(
+                new DataError<>("Errors",map, HttpStatus.BAD_REQUEST)
+        );
     }
 
     @ExceptionHandler(NoSuchElementException.class)
