@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 private final AuthService authService;
-    @PostMapping("/sign-in")
+    @PostMapping("/sign-up")
     public ResponseEntity<User> signUp(@Valid @ModelAttribute FormSignUp formSignUp) {
         User user = authService.signUp(formSignUp);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
