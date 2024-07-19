@@ -66,9 +66,9 @@ public class AdminServiceImpl implements AdminService {
         User user = findById(id);
         if (user != null) {
             if (user.getRoles().stream().anyMatch(role -> role.getRoleName()==RoleName.MANAGER)){
-                user.getRoles().remove(roleRepository.findRoleByRoleName(RoleName.MANAGER));
+                user.getRoles().remove(roleRepository.findRoleByRoleName(RoleName.MANAGER).orElseThrow(()->new NoSuchElementException("Role not found")));
             } else {
-                user.getRoles().add(roleRepository.findRoleByRoleName(RoleName.MANAGER));
+                user.getRoles().add(roleRepository.findRoleByRoleName(RoleName.MANAGER).orElseThrow(()->new NoSuchElementException("Role not found")));
             }
             userRepository.save(user);
             return user;

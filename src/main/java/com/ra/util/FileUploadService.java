@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application-dev.properties")
 public class FileUploadService
 {
     @Value("${bucketName}")
