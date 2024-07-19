@@ -62,10 +62,10 @@ public class SecurityConfig {
         http
                 .cors(config ->config.configurationSource(request -> {
                     CorsConfiguration cf = new CorsConfiguration();
-                    cf.setAllowedOrigins(List.of("http://localhost:5173/"));
-                    cf.setAllowedHeaders(List.of(""));
+                    cf.setAllowedOrigins(List.of("http://localhost:5173/","http://localhost:5174/"));
+                    cf.setAllowedHeaders(List.of("*"));
                     cf.setAllowCredentials(true);
-                    cf.setAllowedMethods(List.of(""));
+                    cf.setAllowedMethods(List.of("*"));
                     cf.setExposedHeaders(List.of("*"));
                     return cf;
                 })).csrf(csrf->csrf.disable())

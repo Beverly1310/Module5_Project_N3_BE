@@ -1,16 +1,14 @@
 package com.ra.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 @Setter
 @Entity
@@ -34,5 +32,6 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_Id", referencedColumnName = "id")
     private Category category;
+
 
 }
