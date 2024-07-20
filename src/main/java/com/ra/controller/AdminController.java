@@ -23,8 +23,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
+public class AdminController {
     private final ICategoryService categoryService;
     private final IProductService productService;
+    private final AdminService adminService;
+
     //    Category management
 
     //    Display all
@@ -49,7 +52,7 @@ import org.springframework.web.bind.annotation.*;
     //    Update
     @GetMapping("/category/{id}/update")
     public ResponseEntity<CategoryForm> getCurrentCategory(@PathVariable Long id) {
-        CategoryForm categoryForm=categoryService.getCategoryToUpdate(id);
+        CategoryForm categoryForm = categoryService.getCategoryToUpdate(id);
 
         return ResponseEntity.ok(categoryForm);
 
@@ -63,25 +66,27 @@ import org.springframework.web.bind.annotation.*;
         return ResponseEntity.ok().build();
 
     }
-//    Delete
+
+    //    Delete
     @DeleteMapping("/category/{id}/delete")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         categoryService.delete(id);
         return ResponseEntity.ok().build();
 
     }
-//    Product management
+
+    //    Product management
 //    Display all
-@GetMapping("/product")
-public ResponseEntity<Page<ProductResponse>> getProducts(
-        @RequestParam(defaultValue = "") String keyword,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "5") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String sortDirection) {
-    Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
-    return ResponseEntity.ok(productResponses);
-}
+    @GetMapping("/product")
+    public ResponseEntity<Page<ProductResponse>> getProducts(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
+        return ResponseEntity.ok(productResponses);
+    }
 
     //Add
     @PostMapping("/product/add")
@@ -93,7 +98,7 @@ public ResponseEntity<Page<ProductResponse>> getProducts(
     //    Update
     @GetMapping("/product/{id}/update")
     public ResponseEntity<ProductForm> getProductToUpdate(@PathVariable Long id) {
-        ProductForm form=productService.getProductToUpdate(id);
+        ProductForm form = productService.getProductToUpdate(id);
 
         return ResponseEntity.ok(form);
 
@@ -106,29 +111,31 @@ public ResponseEntity<Page<ProductResponse>> getProducts(
         return ResponseEntity.ok().build();
 
     }
+
     //    Delete
     @DeleteMapping("/product/{id}/delete")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.ok().build();
+    }
+        @GetMapping("/user")
+        public ResponseEntity<Page<User>> getAllUsers
+        (@PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+                @RequestParam(required = false) String direction,
+                @RequestParam(defaultValue = "") String search
+                                       ){
+            Page<User> users = adminService.getUserWithPagingAndSorting(pageable, direction, search);
+            return ResponseEntity.ok().body(users);
+        }
+        @PutMapping("/user/{userId}")
+        public ResponseEntity<User> changeStatus (@PathVariable("userId") Long userId){
+            User user = adminService.changStatus(userId);
+            return ResponseEntity.ok().body(user);
+        }
+        @PutMapping("user/setrole/{userId}")
+        public ResponseEntity<User> changeRole (@PathVariable("userId") Long userId){
+            User user = adminService.setRole(userId);
+            return ResponseEntity.ok().body(user);
+        }
+    }
 
-    private final AdminService adminService;
-    @GetMapping("/user")
-    public ResponseEntity<Page<User>> getAllUsers( @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
-                                                   @RequestParam(required = false) String direction,
-                                                   @RequestParam(defaultValue = "") String search
-                                       ) {
-        Page<User> users = adminService.getUserWithPagingAndSorting(pageable,direction,search);
-        return ResponseEntity.ok().body(users);
-    }
-    @PutMapping("/user/{userId}")
-    public ResponseEntity<User> changeStatus(@PathVariable("userId") Long userId) {
-        User user = adminService.changStatus(userId);
-        return ResponseEntity.ok().body(user);
-    }
-    @PutMapping("user/setrole/{userId}")
-    public ResponseEntity<User> changeRole(@PathVariable("userId") Long userId) {
-       User user = adminService.setRole(userId);
-       return ResponseEntity.ok().body(user);
-    }
-}
