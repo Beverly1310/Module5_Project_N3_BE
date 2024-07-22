@@ -1,10 +1,12 @@
 package com.ra.service;
 
 import com.ra.model.dto.req.CategoryForm;
+import com.ra.model.dto.res.CategoryFormResponse;
 import com.ra.model.dto.res.CategoryWithProductsDTO;
 import com.ra.model.entity.Category;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ICategoryService {
@@ -15,5 +17,6 @@ public interface ICategoryService {
     void delete (Long id);
     void update(CategoryForm updateCategoryForm);
     Optional<CategoryWithProductsDTO> findCategoryWithProducts(Long categoryId);
+    List<CategoryFormResponse> getAllForInput();
 
 }
