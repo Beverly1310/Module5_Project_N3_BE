@@ -30,6 +30,8 @@ public class AdminController {
     private final ICategoryService categoryService;
     private final IProductService productService;
     private final IBrandService brandService;
+    private final AdminService adminService;
+
     //    Category management
 
     //    Display all
@@ -54,7 +56,7 @@ public class AdminController {
     //    Update
     @GetMapping("/category/{id}/update")
     public ResponseEntity<CategoryForm> getCurrentCategory(@PathVariable Long id) {
-        CategoryForm categoryForm=categoryService.getCategoryToUpdate(id);
+        CategoryForm categoryForm = categoryService.getCategoryToUpdate(id);
 
         return ResponseEntity.ok(categoryForm);
 
@@ -68,14 +70,16 @@ public class AdminController {
         return ResponseEntity.ok().build();
 
     }
-//    Delete
+
+    //    Delete
     @DeleteMapping("/category/{id}/delete")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         categoryService.delete(id);
         return ResponseEntity.ok().build();
 
     }
-//    Product management
+
+    //    Product management
 //    Display all
 @GetMapping("/product")
 public ResponseEntity<ProductPageResponse> getProducts(
@@ -91,6 +95,8 @@ public ResponseEntity<ProductPageResponse> getProducts(
     response.setTotalPages(productResponses.getTotalPages());
     return ResponseEntity.ok(response);
 }
+
+
 
     //Add
     @GetMapping("product/add")
@@ -119,6 +125,7 @@ public ResponseEntity<ProductPageResponse> getProducts(
         ProductForm form=productService.getProductToUpdate(id);
         form.setBrandList(brands);
         form.setCategoryList(categories);
+
         return ResponseEntity.ok(form);
 
     }
@@ -130,6 +137,7 @@ public ResponseEntity<ProductPageResponse> getProducts(
         return ResponseEntity.ok().build();
 
     }
+
     //    Delete
     @DeleteMapping("/product/{id}/delete")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
@@ -137,23 +145,26 @@ public ResponseEntity<ProductPageResponse> getProducts(
         return ResponseEntity.ok().build();
     }
 
-    private final AdminService adminService;
     @GetMapping("/user")
-    public ResponseEntity<Page<User>> getAllUsers( @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
-                                                   @RequestParam(required = false) String direction,
-                                                   @RequestParam(defaultValue = "") String search
-                                       ) {
-        Page<User> users = adminService.getUserWithPagingAndSorting(pageable,direction,search);
+    public ResponseEntity<Page<User>> getAllUsers
+            (@PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+             @RequestParam(required = false) String direction,
+             @RequestParam(defaultValue = "") String search
+            ) {
+        Page<User> users = adminService.getUserWithPagingAndSorting(pageable, direction, search);
         return ResponseEntity.ok().body(users);
     }
+
     @PutMapping("/user/{userId}")
     public ResponseEntity<User> changeStatus(@PathVariable("userId") Long userId) {
         User user = adminService.changStatus(userId);
         return ResponseEntity.ok().body(user);
     }
+
     @PutMapping("user/setrole/{userId}")
     public ResponseEntity<User> changeRole(@PathVariable("userId") Long userId) {
-       User user = adminService.setRole(userId);
-       return ResponseEntity.ok().body(user);
+        User user = adminService.setRole(userId);
+        return ResponseEntity.ok().body(user);
     }
 }
+
