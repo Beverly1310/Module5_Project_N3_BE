@@ -8,6 +8,7 @@ import com.ra.repository.RoleRepository;
 import com.ra.repository.UserRepository;
 import com.ra.security.jwt.JWTProvider;
 import com.ra.service.AuthService;
+import com.ra.util.FileUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private JWTProvider jwtProvider;
    @Autowired
-   private com.ra.project.util.FileUploadService fileUploadService;
+   private FileUploadService fileUploadService;
     @Override
     public User signUp(FormSignUp formSignUp) {
         User user = User.builder()

@@ -28,5 +28,6 @@ public class ProductResponse {
     private LocalDate createdAt;
 
     private LocalDate updatedAt;
+    private boolean status;
 
 }

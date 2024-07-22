@@ -1,6 +1,7 @@
 package com.ra.service.imp;
 
 import com.ra.model.dto.req.CategoryForm;
+import com.ra.model.dto.res.CategoryFormResponse;
 import com.ra.model.dto.res.CategoryWithProductsDTO;
 import com.ra.model.dto.res.ProductResponse;
 import com.ra.model.entity.Category;
@@ -88,6 +89,20 @@ public class CategoryServiceImpl implements ICategoryService {
             return Optional.of(new CategoryWithProductsDTO(category.get(), responses, message));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<CategoryFormResponse> getAllForInput() {
+        List<Category> categories=categoryRepository.findAll();
+        List<CategoryFormResponse> responses=new ArrayList<>();
+        for (Category category:categories){
+            CategoryFormResponse categoryForm= CategoryFormResponse.builder()
+                    .categoryId(category.getId())
+                    .categoryName(category.getCategoryName()).
+                    build();
+            responses.add(categoryForm);
+        }
+        return responses;
     }
 
 }

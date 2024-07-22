@@ -2,16 +2,17 @@ package com.ra.controller;
 
 import com.ra.model.dto.req.CategoryForm;
 import com.ra.model.dto.req.ProductForm;
+import com.ra.model.dto.res.BrandFormResponse;
+import com.ra.model.dto.res.CategoryFormResponse;
+import com.ra.model.dto.res.ProductPageResponse;
 import com.ra.model.dto.res.ProductResponse;
 import com.ra.model.entity.Category;
+import com.ra.model.entity.User;
+import com.ra.service.AdminService;
+import com.ra.service.IBrandService;
 import com.ra.service.ICategoryService;
 import com.ra.service.IProductService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import com.ra.model.entity.User;
-import com.ra.service.AdminService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +21,15 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
+public class AdminController {
     private final ICategoryService categoryService;
     private final IProductService productService;
+    private final IBrandService brandService;
     //    Category management
 
     //    Display all
@@ -73,19 +78,35 @@ import org.springframework.web.bind.annotation.*;
 //    Product management
 //    Display all
 @GetMapping("/product")
-public ResponseEntity<Page<ProductResponse>> getProducts(
+public ResponseEntity<ProductPageResponse> getProducts(
         @RequestParam(defaultValue = "") String keyword,
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "5") int size,
         @RequestParam(defaultValue = "id") String sortBy,
         @RequestParam(defaultValue = "asc") String sortDirection) {
     Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
-    return ResponseEntity.ok(productResponses);
+
+    ProductPageResponse response = new ProductPageResponse();
+    response.setProducts(productResponses.getContent());
+    response.setTotalPages(productResponses.getTotalPages());
+    return ResponseEntity.ok(response);
 }
 
     //Add
+    @GetMapping("product/add")
+    public ResponseEntity<ProductForm> addNewProduct() {
+        List<CategoryFormResponse> categories = categoryService.getAllForInput();
+        List<BrandFormResponse> brands = brandService.getAllForInput();
+
+        ProductForm productForm = ProductForm.builder()
+                .categoryList(categories)
+                .brandList(brands)
+                .build();
+
+        return ResponseEntity.ok(productForm);
+    }
     @PostMapping("/product/add")
-    public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductForm productForm) {
+    public ResponseEntity<?> submitNewProduct(@Valid @ModelAttribute ProductForm productForm) {
         productService.add(productForm);
         return ResponseEntity.ok().build();
     }
@@ -93,8 +114,11 @@ public ResponseEntity<Page<ProductResponse>> getProducts(
     //    Update
     @GetMapping("/product/{id}/update")
     public ResponseEntity<ProductForm> getProductToUpdate(@PathVariable Long id) {
+        List<CategoryFormResponse> categories = categoryService.getAllForInput();
+        List<BrandFormResponse> brands = brandService.getAllForInput();
         ProductForm form=productService.getProductToUpdate(id);
-
+        form.setBrandList(brands);
+        form.setCategoryList(categories);
         return ResponseEntity.ok(form);
 
     }
@@ -111,6 +135,7 @@ public ResponseEntity<Page<ProductResponse>> getProducts(
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.ok().build();
+    }
 
     private final AdminService adminService;
     @GetMapping("/user")
