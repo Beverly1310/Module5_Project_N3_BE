@@ -1,11 +1,14 @@
 package com.ra.controller;
 
+import com.ra.model.dto.req.BannerAdd;
+import com.ra.model.dto.req.BannerEdit;
 import com.ra.model.dto.req.CategoryForm;
 import com.ra.model.dto.req.ProductForm;
 import com.ra.model.dto.res.BrandFormResponse;
 import com.ra.model.dto.res.CategoryFormResponse;
 import com.ra.model.dto.res.ProductPageResponse;
 import com.ra.model.dto.res.ProductResponse;
+import com.ra.model.entity.Banner;
 import com.ra.model.entity.Category;
 import com.ra.model.entity.User;
 import com.ra.service.AdminService;
@@ -15,6 +18,9 @@ import com.ra.service.IProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import com.ra.model.entity.User;
+import com.ra.service.AdminService;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -165,6 +171,29 @@ public ResponseEntity<ProductPageResponse> getProducts(
     public ResponseEntity<User> changeRole(@PathVariable("userId") Long userId) {
         User user = adminService.setRole(userId);
         return ResponseEntity.ok().body(user);
+    }
+
+    @GetMapping("/banner")
+    public ResponseEntity<List<Banner>> getAllBanners() {
+        List<Banner> banners = adminService.getBanners();
+        return ResponseEntity.ok().body(banners);
+    }
+
+    @PostMapping("/banner")
+    public ResponseEntity<Banner> addBanner(@Valid @ModelAttribute BannerAdd bannerAdd) {
+        Banner banner = adminService.addBanner(bannerAdd);
+        return ResponseEntity.ok().body(banner);
+    }
+    @DeleteMapping("/banner/{bannerId}")
+    public ResponseEntity<?> deleteBanner(@PathVariable  Long bannerId) {
+        adminService.deleteBanner(bannerId);
+        return ResponseEntity.ok().body("Deleted banner");
+    }
+    @PutMapping("/banner")
+    public ResponseEntity<?> updateBanner(@Valid @ModelAttribute BannerEdit bannerEdit) {
+        Banner banner = adminService.updateBanner(bannerEdit);
+        return ResponseEntity.ok().body(banner);
+
     }
 }
 
