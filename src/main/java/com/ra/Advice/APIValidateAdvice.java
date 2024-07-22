@@ -3,6 +3,7 @@ package com.ra.advice;
 
 import com.ra.model.dto.res.DataError;
 import org.hibernate.exception.DataException;
+import org.springframework.core.type.classreading.ClassFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -23,9 +24,7 @@ public class APIValidateAdvice {
             FieldError error = ex.getFieldErrors().get(i);
             map.put(error.getField(), error.getDefaultMessage());
         }
-        return ResponseEntity.badRequest().body(
-                new DataError<>("Errors",map, HttpStatus.BAD_REQUEST)
-        );
+        return new ResponseEntity<>(new DataError<>("Error",map,HttpStatus.BAD_REQUEST),HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
