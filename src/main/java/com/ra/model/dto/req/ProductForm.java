@@ -1,10 +1,11 @@
 package com.ra.model.dto.req;
 
+import com.ra.model.dto.res.BrandFormResponse;
+import com.ra.model.dto.res.CategoryFormResponse;
+import com.ra.model.dto.res.ImageFormResponse;
 import com.ra.model.entity.Image;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,11 +26,12 @@ public class ProductForm {
     private String image;
     private MultipartFile imageFile;
 
-    @NotNull(message = "Category ID is mandatory")
     private Long categoryId;
-    @NotNull(message = "Brand ID is mandatory")
+    List<CategoryFormResponse> categoryList;
+    List<BrandFormResponse> brandList;
     private Long brandId;
 
-    List<Image> imageList;
+    List<ImageFormResponse> imageList;
+    List<Long> imageIdList;
     List<MultipartFile> imageFileList;
 }
