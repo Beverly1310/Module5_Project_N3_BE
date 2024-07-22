@@ -48,7 +48,7 @@ public class User {
     @Column(name = "is_delete")
     private Boolean isDeleted=false;
     private Double point;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
