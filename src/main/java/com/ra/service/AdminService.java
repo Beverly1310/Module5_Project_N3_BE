@@ -4,6 +4,7 @@ package com.ra.service;
 import com.ra.model.dto.req.BannerAdd;
 import com.ra.model.dto.req.BannerEdit;
 import com.ra.model.entity.Banner;
+import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +20,5 @@ public interface AdminService {
     Banner addBanner(BannerAdd bannerAdd);
     void deleteBanner(Long id);
     Banner updateBanner(BannerEdit bannerEdit);
+    List<Orders> getOrders();
 }

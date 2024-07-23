@@ -7,8 +7,10 @@ import com.ra.model.dto.req.ProductForm;
 import com.ra.model.dto.res.ProductResponse;
 import com.ra.model.entity.Banner;
 import com.ra.model.entity.Category;
+import com.ra.model.entity.Orders;
 import com.ra.service.ICategoryService;
 import com.ra.service.IProductService;
+import jakarta.persistence.criteria.Order;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -164,6 +166,10 @@ public class AdminController {
     public ResponseEntity<?> updateBanner(@Valid @ModelAttribute BannerEdit bannerEdit) {
         Banner banner = adminService.updateBanner(bannerEdit);
         return ResponseEntity.ok().body(banner);
+    }
+    @GetMapping("/orders")
+    public ResponseEntity<List<Orders>> getAllOrders() {
+        return ResponseEntity.ok().body(adminService.getOrders());
     }
 }
 
