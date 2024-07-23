@@ -4,8 +4,10 @@ import com.ra.model.cons.RoleName;
 import com.ra.model.dto.req.BannerAdd;
 import com.ra.model.dto.req.BannerEdit;
 import com.ra.model.entity.Banner;
+import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import com.ra.repository.BannerRepository;
+import com.ra.repository.OrdersRepository;
 import com.ra.repository.RoleRepository;
 import com.ra.repository.UserRepository;
 import com.ra.service.AdminService;
@@ -29,7 +31,7 @@ public class AdminServiceImpl implements AdminService {
     private final RoleRepository roleRepository;
     private final BannerRepository bannerRepository;
     private final FileUploadService fileUploadService;
-
+    private final OrdersRepository ordersRepository;
     @Override
     public Page<User> getUserWithPagingAndSorting(Pageable pageable,String direction,String search) {
         if (direction!=null){
@@ -128,5 +130,10 @@ public class AdminServiceImpl implements AdminService {
             return bannerRepository.save(banner);
         }
         return banner;
+    }
+
+    @Override
+    public List<Orders> getOrders() {
+        return ordersRepository.findAll();
     }
 }
