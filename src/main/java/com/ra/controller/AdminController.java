@@ -1,20 +1,14 @@
 package com.ra.controller;
 
-import com.ra.model.dto.req.BannerAdd;
-import com.ra.model.dto.req.BannerEdit;
-import com.ra.model.dto.req.CategoryForm;
-import com.ra.model.dto.req.ProductForm;
+import com.ra.model.dto.req.*;
 import com.ra.model.dto.res.ProductResponse;
-import com.ra.model.entity.Banner;
-import com.ra.model.entity.Category;
-import com.ra.model.entity.Orders;
+import com.ra.model.entity.*;
 import com.ra.service.ICategoryService;
 import com.ra.service.IProductService;
 import jakarta.persistence.criteria.Order;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import com.ra.model.entity.User;
 import com.ra.service.AdminService;
 
 import org.springframework.data.domain.Pageable;
@@ -171,6 +165,25 @@ public class AdminController {
     public ResponseEntity<List<Orders>> getAllOrders() {
         return ResponseEntity.ok().body(adminService.getOrders());
     }
-
+    @GetMapping("/coupon")
+    public ResponseEntity<List<Coupon>> getAllCoupons() {
+        List<Coupon> coupons = adminService.getCoupons();
+        return ResponseEntity.ok().body(coupons);
+    }
+    @PostMapping("/coupon")
+    public ResponseEntity<Coupon> addCoupon(@Valid @RequestBody CouponAdd couponAdd) {
+        Coupon coupon = adminService.addCoupon(couponAdd);
+        return ResponseEntity.ok().body(coupon);
+    }
+    @DeleteMapping("/coupon/{id}")
+    public ResponseEntity<?> deleteCoupon(@PathVariable Long id) {
+        adminService.deleteCoupon(id);
+        return ResponseEntity.ok().body("Deleted coupon");
+    }
+    @PutMapping("/coupon")
+    public ResponseEntity<?> updateCoupon(@Valid @RequestBody CouponEdit couponEdit) {
+        Coupon coupon = adminService.updateCoupon(couponEdit);
+        return ResponseEntity.ok().body(coupon);
+    }
 }
 
