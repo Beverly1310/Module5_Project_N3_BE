@@ -2,8 +2,8 @@ package com.ra.model.dto.req;
 
 import com.ra.model.dto.res.BrandFormResponse;
 import com.ra.model.dto.res.CategoryFormResponse;
+import com.ra.model.dto.res.ColorFormResponse;
 import com.ra.model.dto.res.ImageFormResponse;
-import com.ra.model.entity.Image;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
@@ -29,8 +29,9 @@ public class ProductForm {
     private Long categoryId;
     List<CategoryFormResponse> categoryList;
     List<BrandFormResponse> brandList;
+    List<ColorFormResponse> colorList;
     private Long brandId;
-
+    List<ProductDetailRequest> detailRequests;
     List<ImageFormResponse> imageList;
     List<Long> imageIdList;
     List<MultipartFile> imageFileList;

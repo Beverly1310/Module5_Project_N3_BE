@@ -1,16 +1,11 @@
 package com.ra.service.imp;
 
+import com.ra.model.dto.req.ProductDetailRequest;
 import com.ra.model.dto.req.ProductForm;
 import com.ra.model.dto.res.ImageFormResponse;
 import com.ra.model.dto.res.ProductResponse;
-import com.ra.model.entity.Brand;
-import com.ra.model.entity.Category;
-import com.ra.model.entity.Image;
-import com.ra.model.entity.Product;
-import com.ra.repository.BrandRepository;
-import com.ra.repository.CategoryRepository;
-import com.ra.repository.ImageRepository;
-import com.ra.repository.ProductRepository;
+import com.ra.model.entity.*;
+import com.ra.repository.*;
 import com.ra.service.IProductService;
 import com.ra.util.FileUploadService;
 import lombok.AllArgsConstructor;
@@ -37,6 +32,8 @@ public class ProductServiceImpl implements IProductService {
     private final BrandRepository brandRepository;
     private final ImageRepository imageRepository;
     private final FileUploadService fileUploadService;
+    private final ProductDetailRepository productDetailRepository;
+    private final ColorRepository colorRepository;
 
     @Override
     public Page<ProductResponse> findProductsByKeyword(String keyword, int page, int size, String sortBy, String sortDirection) {
@@ -82,6 +79,21 @@ public class ProductServiceImpl implements IProductService {
                 if (!imageList.isEmpty()) {
                     imageRepository.saveAll(imageList);
                 }
+                if (productForm.getDetailRequests() != null) {
+                    for (ProductDetailRequest detailRequest : productForm.getDetailRequests()) {
+                        ProductDetail productDetail = new ProductDetail();
+                        String src = fileUploadService.uploadFileToServer(detailRequest.getImageFile());
+                        productDetail.setImage(detailRequest.getImage());
+                        productDetail.setProductDetailName(detailRequest.getProductDetailName());
+                        productDetail.setStatus(true);
+                        productDetail.setStock(detailRequest.getStock());
+                        productDetail.setUnitPrice(detailRequest.getUnitPrice());
+                        Color color = colorRepository.findById(detailRequest.getColorId()).orElseThrow();
+                        productDetail.setColor(color);
+                        productDetail.setProduct(product);
+                        productDetailRepository.save(productDetail);
+                    }
+                }
                 isSaved = true;
             } catch (DataIntegrityViolationException e) {
                 System.out.println("SKU conflict detected, generating a new SKU and retrying...");
@@ -104,6 +116,7 @@ public class ProductServiceImpl implements IProductService {
 
     }
 
+
     @Override
     public ProductForm getProductToUpdate(Long id) {
         Product product = productRepository.findById(id)
@@ -114,6 +127,17 @@ public class ProductServiceImpl implements IProductService {
         for (Image image : imageList) {
             responses.add(new ImageFormResponse(image.getId(), image.getSrc()));
             idResponses.add(image.getId());
+        }
+        List<ProductDetail> productDetails = productDetailRepository.findAllByProductId(id);
+        List<ProductDetailRequest> productDetailRequests = new ArrayList<>();
+        for (ProductDetail productDetail : productDetails) {
+            productDetailRequests.add(ProductDetailRequest.builder()
+                    .productDetailId(productDetail.getId())
+                    .image(productDetail.getImage())
+                    .stock(productDetail.getStock())
+                    .unitPrice(productDetail.getUnitPrice())
+                    .colorId(productDetail.getColor().getId())
+                    .build());
         }
         return ProductForm.builder()
                 .brandId(product.getBrand().getId())
@@ -172,6 +196,48 @@ public class ProductServiceImpl implements IProductService {
 
 //        }
 
+        // Update product details
+        if (productForm.getDetailRequests() == null || productForm.getDetailRequests().isEmpty()) {
+            // Remove existing details if removing all
+            productDetailRepository.deleteAllByProductId(productForm.getId());
+        } else {
+            List<ProductDetail> currentDetailList = productDetailRepository.findAllByProductId(productForm.getId());
+            List<ProductDetailRequest> requests = productForm.getDetailRequests();
+//            Remove deleted details
+            for (ProductDetail detail : currentDetailList) {
+                if (requests.stream().noneMatch(request->request.getProductDetailId().equals(detail.getId()))){
+                    productDetailRepository.delete(detail);
+                }
+            }
+            for (ProductDetailRequest detailRequest : requests) {
+//               Add new details
+                if (!productDetailRepository.existsByProductIdAndColorId(productForm.getId(), detailRequest.getColorId())) {
+                    ProductDetail productDetail = new ProductDetail();
+                    productDetail.setId(detailRequest.getProductDetailId()); // For update, otherwise skip if new
+                    productDetail.setImage(fileUploadService.uploadFileToServer(detailRequest.getImageFile()));
+                    productDetail.setProductDetailName(detailRequest.getProductDetailName());
+                    productDetail.setStatus(detailRequest.isStatus());
+                    productDetail.setStock(detailRequest.getStock());
+                    productDetail.setUnitPrice(detailRequest.getUnitPrice());
+                    Color color = colorRepository.findById(detailRequest.getColorId())
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid color ID"));
+                    productDetail.setColor(color);
+                    productDetail.setProduct(product);
+                    productDetailRepository.save(productDetail);
+                } else {
+//                    Update existing details
+                    ProductDetail productDetail = productDetailRepository.findById(detailRequest.getProductDetailId()).get();
+                    if (detailRequest.getImageFile().getSize() > 0) {
+                        productDetail.setImage(fileUploadService.uploadFileToServer(detailRequest.getImageFile()));
+                    }
+                    productDetail.setProductDetailName(detailRequest.getProductDetailName());
+                    productDetail.setStatus(detailRequest.isStatus());
+                    productDetail.setStock(detailRequest.getStock());
+                    productDetail.setUnitPrice(detailRequest.getUnitPrice());
+                    productDetailRepository.save(productDetail);
+                }
+            }
+        }
         // Update the product details
         product.setProductName(productForm.getProductName());
         product.setDescription(productForm.getDescription());
@@ -188,7 +254,8 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductResponse findById(Long id) {
-        return null;
+        Product product = productRepository.findById(id).get();
+        return getResponse(product);
     }
 
     @Override

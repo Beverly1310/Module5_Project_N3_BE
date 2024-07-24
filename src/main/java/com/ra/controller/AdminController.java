@@ -2,16 +2,10 @@ package com.ra.controller;
 
 import com.ra.model.dto.req.CategoryForm;
 import com.ra.model.dto.req.ProductForm;
-import com.ra.model.dto.res.BrandFormResponse;
-import com.ra.model.dto.res.CategoryFormResponse;
-import com.ra.model.dto.res.ProductPageResponse;
-import com.ra.model.dto.res.ProductResponse;
+import com.ra.model.dto.res.*;
 import com.ra.model.entity.Category;
 import com.ra.model.entity.User;
-import com.ra.service.AdminService;
-import com.ra.service.IBrandService;
-import com.ra.service.ICategoryService;
-import com.ra.service.IProductService;
+import com.ra.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +25,7 @@ public class AdminController {
     private final IProductService productService;
     private final IBrandService brandService;
     private final AdminService adminService;
+    private final IColorService colorService;
 
     //    Category management
 
@@ -103,10 +98,11 @@ public ResponseEntity<ProductPageResponse> getProducts(
     public ResponseEntity<ProductForm> addNewProduct() {
         List<CategoryFormResponse> categories = categoryService.getAllForInput();
         List<BrandFormResponse> brands = brandService.getAllForInput();
-
+        List<ColorFormResponse> colors=colorService.getAllForInput();
         ProductForm productForm = ProductForm.builder()
                 .categoryList(categories)
                 .brandList(brands)
+                .colorList(colors)
                 .build();
 
         return ResponseEntity.ok(productForm);
