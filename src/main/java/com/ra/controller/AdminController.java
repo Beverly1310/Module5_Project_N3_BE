@@ -53,7 +53,7 @@ public class AdminController {
     private final IProductService productService;
     private final AdminService adminService;
     private final IColorService colorService;
-
+    private final IBrandService brandService;
     //    Category management
 
     //    Display all
@@ -226,6 +226,26 @@ public class AdminController {
     public ResponseEntity<?> updateCoupon(@Valid @RequestBody CouponEdit couponEdit) {
         Coupon coupon = adminService.updateCoupon(couponEdit);
         return ResponseEntity.ok().body(coupon);
+    }
+    @GetMapping("/event")
+    public ResponseEntity<List<Event>> getAllEvents() {
+        List<Event> events = adminService.getEvents();
+        return ResponseEntity.ok().body(events);
+    }
+    @PostMapping("/event")
+    public ResponseEntity<Event> addEvent(@Valid @RequestBody EventAdd eventAdd) {
+        Event event = adminService.addEvent(eventAdd);
+        return ResponseEntity.ok().body(event);
+    }
+    @DeleteMapping("/event/{id}")
+    public ResponseEntity<?> deleteEvent(@PathVariable Long id) {
+        adminService.deleteEvent(id);
+        return ResponseEntity.ok().body("Deleted event");
+    }
+    @PutMapping("/event")
+    public ResponseEntity<?> updateEvent(@Valid @RequestBody EventEdit eventEdit) {
+        Event event = adminService.updateEvent(eventEdit);
+        return ResponseEntity.ok().body(event);
     }
 }
 

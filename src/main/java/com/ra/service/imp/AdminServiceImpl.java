@@ -1,15 +1,9 @@
 package com.ra.service.imp;
 
 import com.ra.model.cons.RoleName;
-import com.ra.model.dto.req.BannerAdd;
-import com.ra.model.dto.req.BannerEdit;
+import com.ra.model.dto.req.*;
 
-import com.ra.model.dto.req.CouponAdd;
-import com.ra.model.dto.req.CouponEdit;
-import com.ra.model.entity.Banner;
-import com.ra.model.entity.Coupon;
-import com.ra.model.entity.Orders;
-import com.ra.model.entity.User;
+import com.ra.model.entity.*;
 import com.ra.repository.*;
 
 import com.ra.model.entity.Banner;
@@ -43,7 +37,7 @@ public class AdminServiceImpl implements AdminService {
     private final BannerRepository bannerRepository;
     private final FileUploadService fileUploadService;
     private final OrdersRepository ordersRepository;
-
+    private final EventRepository eventRepository;
     private final CouponRepository couponRepository;
 
 
@@ -215,4 +209,49 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+    @Override
+    public List<Event> getEvents() {
+        return eventRepository.findAll();
+    }
+
+    @Override
+    public Event addEvent(EventAdd eventAdd) {
+        Event event = Event.builder()
+                .discount(eventAdd.getDiscount())
+                .startDate(eventAdd.getStartDate())
+                .endDate(eventAdd.getEndDate())
+                .status(true)
+                .title(eventAdd.getTitle())
+                .build();
+        return eventRepository.save(event);
+    }
+
+    @Override
+    public void deleteEvent(Long id) {
+        eventRepository.deleteById(id);
+    }
+
+    @Override
+    public Event updateEvent(EventEdit eventEdit) {
+        Event event = eventRepository.findById(eventEdit.getId()).orElse(null);
+        if (event != null) {
+            if (eventEdit.getDiscount() != null && !eventEdit.getDiscount().isEmpty()) {
+                event.setDiscount(eventEdit.getDiscount());
+            }
+
+            if (eventEdit.getEndDate() != null) {
+                event.setEndDate(eventEdit.getEndDate());
+            }
+            if (eventEdit.getStartDate() != null) {
+                event.setStartDate(eventEdit.getStartDate());
+            }
+            if (eventEdit.getTitle() != null && !eventEdit.getTitle().isEmpty()) {
+                event.setTitle(eventEdit.getTitle());
+            }
+            return eventRepository.save(event);
+
+        } else {
+            throw new RuntimeException("Coupon not found");
+        }
+    }
 }

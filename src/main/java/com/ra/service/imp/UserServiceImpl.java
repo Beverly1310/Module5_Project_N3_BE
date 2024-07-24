@@ -7,7 +7,8 @@ import com.ra.model.entity.User;
 import com.ra.model.entity.WishList;
 import com.ra.repository.ProductRepository;
 import com.ra.repository.UserRepository;
-import com.ra.repository.WishListRepository;
+
+import com.ra.repository.WishlistRepository;
 import com.ra.security.principal.CustomUserDetail;
 import com.ra.service.UserService;
 import com.ra.util.FileUploadService;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
-    private final WishListRepository wishListRepository;
+    private final WishlistRepository wishListRepository;
   private final ProductRepository productRepository;
     @Override
     public boolean changePassword(ChangePasswordRequest changePasswordRequest) {
