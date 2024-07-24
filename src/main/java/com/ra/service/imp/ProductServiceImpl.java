@@ -1,6 +1,7 @@
 package com.ra.service.imp;
 
 import com.ra.model.dto.req.ProductForm;
+import com.ra.model.dto.res.ImageFormResponse;
 import com.ra.model.dto.res.ProductResponse;
 import com.ra.model.entity.Brand;
 import com.ra.model.entity.Category;
@@ -26,6 +27,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -65,7 +67,7 @@ public class ProductServiceImpl implements IProductService {
                     .category(category)
                     .brand(brand)
                     .createdAt(LocalDate.now())
-                    .updatedAt(LocalDate.now())
+                    .updatedAt(LocalDate.now()).status(true)
                     .build();
             List<Image> imageList = new ArrayList<>();
             for (MultipartFile image : productForm.getImageFileList()) {
@@ -107,11 +109,16 @@ public class ProductServiceImpl implements IProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
         List<Image> imageList = imageRepository.findAllByProductId(id);
+        List<ImageFormResponse> responses = new ArrayList<>();
+        List<Long> idResponses = new ArrayList<>();
+        for (Image image : imageList) {
+            responses.add(new ImageFormResponse(image.getId(), image.getSrc()));
+            idResponses.add(image.getId());
+        }
         return ProductForm.builder()
                 .brandId(product.getBrand().getId())
                 .categoryId(product.getCategory().getId())
-                .image(product.getImage())
-                .imageList(imageList)
+                .image(product.getImage()).imageList(responses).imageIdList(idResponses)
                 .productName(product.getProductName())
                 .description(product.getDescription())
                 .build();
@@ -119,10 +126,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public void removeImageFromForm(ProductForm productForm, Long imageId) {
-        List<Image> images = productForm.getImageList();
-        images.remove(imageRepository.findById(imageId).get());
-        productForm.setImageList(images);
+
     }
+
 
     @Override
     @Transactional
@@ -135,44 +141,50 @@ public class ProductServiceImpl implements IProductService {
         Brand brand = brandRepository.findById(productForm.getBrandId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid brand ID"));
 
-        // Handle the main image update
-        String image = productForm.getImage();
+        // Update the main image
+        String image = product.getImage();
         if (productForm.getImageFile() != null && !productForm.getImageFile().isEmpty()) {
             image = fileUploadService.uploadFileToServer(productForm.getImageFile());
         }
+        product.setImage(image);
 
-        // Handle the additional images
-        List<MultipartFile> newFiles = productForm.getImageFileList();
+        // Get existing images for this product
         List<Image> existingImages = imageRepository.findAllByProductId(productForm.getId());
 
-        // Add new images
-        List<Image> newImages = new ArrayList<>();
-        for (MultipartFile file : newFiles) {
-            String src = fileUploadService.uploadFileToServer(file);
-            newImages.add(Image.builder().product(product).src(src).build());
-        }
-
-        // Remove images that are not in the new list
-        for (Image img : existingImages) {
-            if (!newImages.contains(img)) {
-                imageRepository.delete(img);
+        // Prepare to add new images
+        List<MultipartFile> files = productForm.getImageFileList();
+        if (files != null) {
+            for (MultipartFile file : files) {
+                String src = fileUploadService.uploadFileToServer(file);
+                Image newImage = Image.builder().src(src).product(product).build();
+                imageRepository.save(newImage);
             }
         }
+
+        // Remove images that are no longer in the list
+        List<Long> currentImageIdList = productForm.getImageIdList();
+//        if (currentImageIdList!=null){
+            for (Image existingImage : existingImages) {
+                if (currentImageIdList.stream().noneMatch(id -> id.equals(existingImage.getId()))) {
+                    imageRepository.delete(existingImage);
+                }
+            }
+
+//        }
 
         // Update the product details
         product.setProductName(productForm.getProductName());
         product.setDescription(productForm.getDescription());
-        product.setImage(image);
         product.setCategory(category);
         product.setBrand(brand);
         product.setUpdatedAt(LocalDate.now());
 
-        // Save updated product and new images
+        // Save updated product
         productRepository.save(product);
-        if (!newImages.isEmpty()) {
-            imageRepository.saveAll(newImages);
-        }
+
+
     }
+
 
     @Override
     public ProductResponse findById(Long id) {
@@ -181,8 +193,12 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<ProductResponse> getNewest() {
-        return null;
-    }
+        List<Product> list = productRepository.getNewest();
+        List<ProductResponse> newestProducts = new ArrayList<>();
+        for (Product product : list) {
+            newestProducts.add(getResponse(product));
+        }
+        return newestProducts;    }
 
     @Override
     public Page<ProductResponse> getAllProductsOnSale(String keyword, int page, int size, String sortBy, String sortDirection) {
@@ -191,7 +207,10 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public List<ProductResponse> getMostSold() {
-        return null;
+        List<Product> topProducts = productRepository.findTop5MostSoldProducts();
+        return topProducts.stream()
+                .map(this::getResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -210,7 +229,7 @@ public class ProductServiceImpl implements IProductService {
                 .brandName(product.getBrand().getBrandName())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
-                .image(product.getImage())
+                .image(product.getImage()).status(product.isStatus())
                 .build();
     }
 }
