@@ -171,5 +171,6 @@ public class AdminController {
     public ResponseEntity<List<Orders>> getAllOrders() {
         return ResponseEntity.ok().body(adminService.getOrders());
     }
+
 }
 
