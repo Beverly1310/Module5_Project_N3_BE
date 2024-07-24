@@ -4,6 +4,7 @@ import com.ra.model.dto.req.BannerAdd;
 import com.ra.model.dto.req.BannerEdit;
 import com.ra.model.dto.req.CategoryForm;
 import com.ra.model.dto.req.ProductForm;
+import com.ra.model.dto.res.*;
 import com.ra.model.dto.res.BrandFormResponse;
 import com.ra.model.dto.res.CategoryFormResponse;
 import com.ra.model.dto.res.ProductPageResponse;
@@ -14,6 +15,7 @@ import com.ra.model.entity.Category;
 import com.ra.model.entity.Orders;
 
 import com.ra.model.entity.User;
+import com.ra.service.*;
 import com.ra.service.AdminService;
 import com.ra.service.IBrandService;
 
@@ -42,6 +44,7 @@ public class AdminController {
     private final IProductService productService;
     private final IBrandService brandService;
     private final AdminService adminService;
+    private final IColorService colorService;
 
     //    Category management
 
@@ -114,10 +117,11 @@ public ResponseEntity<ProductPageResponse> getProducts(
     public ResponseEntity<ProductForm> addNewProduct() {
         List<CategoryFormResponse> categories = categoryService.getAllForInput();
         List<BrandFormResponse> brands = brandService.getAllForInput();
-
+        List<ColorFormResponse> colors=colorService.getAllForInput();
         ProductForm productForm = ProductForm.builder()
                 .categoryList(categories)
                 .brandList(brands)
+                .colorList(colors)
                 .build();
 
         return ResponseEntity.ok(productForm);
@@ -201,7 +205,8 @@ public ResponseEntity<ProductPageResponse> getProducts(
 
     }
     @GetMapping("/orders")
-    public ResponseEntity<List<Orders>> getAllOrders() {
+    public ResponseEntity<List<Orders
+      getAllOrders() {
         return ResponseEntity.ok().body(adminService.getOrders());
     }
 }

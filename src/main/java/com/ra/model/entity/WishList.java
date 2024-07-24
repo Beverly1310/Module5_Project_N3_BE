@@ -19,10 +19,10 @@ public class WishList {
     private Long id;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
 }
