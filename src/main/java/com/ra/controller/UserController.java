@@ -6,6 +6,13 @@ import com.ra.model.dto.req.UserEdit;
 import com.ra.model.dto.res.*;
 import com.ra.model.entity.User;
 import com.ra.service.*;
+import com.ra.model.dto.res.CategoryWithProductsDTO;
+import com.ra.model.dto.res.ResponseData;
+import com.ra.model.entity.Product;
+import com.ra.model.entity.User;
+import com.ra.model.entity.WishList;
+import com.ra.service.ICategoryService;
+import com.ra.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -120,5 +128,15 @@ public class UserController {
     public ResponseEntity<ResponseData<String>> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         userService.changePassword(changePasswordRequest);
         return new ResponseEntity<>(new ResponseData<>("success", "Success", HttpStatus.OK), HttpStatus.OK);
+    }
+    @GetMapping("/wishlist")
+    public  ResponseEntity<ResponseData<List<Product>>> getWishList() {
+        List<Product> wishLists = userService.getWishList();
+        return new ResponseEntity<>(new ResponseData<>("success", wishLists, HttpStatus.OK), HttpStatus.OK);
+    }
+    @DeleteMapping("/wishlist/{productId}")
+    public ResponseEntity<ResponseData<List<Product>>> deleteWishList(@PathVariable Long productId) {
+        List<Product> products = userService.removeProductFromWishList(productId);
+        return new ResponseEntity<>(new ResponseData<>("success", products , HttpStatus.OK), HttpStatus.OK);
     }
 }
