@@ -1,5 +1,10 @@
 package com.ra.controller;
 
+
+import com.ra.model.dto.req.*;
+import com.ra.model.dto.res.ProductResponse;
+import com.ra.model.entity.*;
+
 import com.ra.model.dto.req.BannerAdd;
 import com.ra.model.dto.req.BannerEdit;
 import com.ra.model.dto.req.CategoryForm;
@@ -19,13 +24,17 @@ import com.ra.service.*;
 import com.ra.service.AdminService;
 import com.ra.service.IBrandService;
 
+
 import com.ra.service.ICategoryService;
 import com.ra.service.IProductService;
 import jakarta.persistence.criteria.Order;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+
+
 import com.ra.model.entity.User;
+
 import com.ra.service.AdminService;
 
 import org.springframework.data.domain.Pageable;
@@ -42,7 +51,6 @@ import java.util.List;
 public class AdminController {
     private final ICategoryService categoryService;
     private final IProductService productService;
-    private final IBrandService brandService;
     private final AdminService adminService;
     private final IColorService colorService;
 
@@ -95,24 +103,19 @@ public class AdminController {
 
     //    Product management
 //    Display all
-@GetMapping("/product")
-public ResponseEntity<ProductPageResponse> getProducts(
-        @RequestParam(defaultValue = "") String keyword,
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "5") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String sortDirection) {
-    Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
-
-    ProductPageResponse response = new ProductPageResponse();
-    response.setProducts(productResponses.getContent());
-    response.setTotalPages(productResponses.getTotalPages());
-    return ResponseEntity.ok(response);
-}
-
-
+    @GetMapping("/product")
+    public ResponseEntity<Page<ProductResponse>> getProducts(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
+        return ResponseEntity.ok(productResponses);
+    }
 
     //Add
+
     @GetMapping("product/add")
     public ResponseEntity<ProductForm> addNewProduct() {
         List<CategoryFormResponse> categories = categoryService.getAllForInput();
@@ -126,8 +129,9 @@ public ResponseEntity<ProductPageResponse> getProducts(
 
         return ResponseEntity.ok(productForm);
     }
+
     @PostMapping("/product/add")
-    public ResponseEntity<?> submitNewProduct(@Valid @ModelAttribute ProductForm productForm) {
+    public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductForm productForm) {
         productService.add(productForm);
         return ResponseEntity.ok().build();
     }
@@ -135,11 +139,7 @@ public ResponseEntity<ProductPageResponse> getProducts(
     //    Update
     @GetMapping("/product/{id}/update")
     public ResponseEntity<ProductForm> getProductToUpdate(@PathVariable Long id) {
-        List<CategoryFormResponse> categories = categoryService.getAllForInput();
-        List<BrandFormResponse> brands = brandService.getAllForInput();
-        ProductForm form=productService.getProductToUpdate(id);
-        form.setBrandList(brands);
-        form.setCategoryList(categories);
+        ProductForm form = productService.getProductToUpdate(id);
 
         return ResponseEntity.ok(form);
 
@@ -202,12 +202,30 @@ public ResponseEntity<ProductPageResponse> getProducts(
     public ResponseEntity<?> updateBanner(@Valid @ModelAttribute BannerEdit bannerEdit) {
         Banner banner = adminService.updateBanner(bannerEdit);
         return ResponseEntity.ok().body(banner);
-
     }
     @GetMapping("/orders")
-    public ResponseEntity<List<Orders
-      getAllOrders() {
+    public ResponseEntity<List<Orders>> getAllOrders() {
         return ResponseEntity.ok().body(adminService.getOrders());
+    }
+    @GetMapping("/coupon")
+    public ResponseEntity<List<Coupon>> getAllCoupons() {
+        List<Coupon> coupons = adminService.getCoupons();
+        return ResponseEntity.ok().body(coupons);
+    }
+    @PostMapping("/coupon")
+    public ResponseEntity<Coupon> addCoupon(@Valid @RequestBody CouponAdd couponAdd) {
+        Coupon coupon = adminService.addCoupon(couponAdd);
+        return ResponseEntity.ok().body(coupon);
+    }
+    @DeleteMapping("/coupon/{id}")
+    public ResponseEntity<?> deleteCoupon(@PathVariable Long id) {
+        adminService.deleteCoupon(id);
+        return ResponseEntity.ok().body("Deleted coupon");
+    }
+    @PutMapping("/coupon")
+    public ResponseEntity<?> updateCoupon(@Valid @RequestBody CouponEdit couponEdit) {
+        Coupon coupon = adminService.updateCoupon(couponEdit);
+        return ResponseEntity.ok().body(coupon);
     }
 }
 

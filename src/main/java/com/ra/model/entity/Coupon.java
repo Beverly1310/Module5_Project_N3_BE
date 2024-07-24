@@ -12,7 +12,8 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "coupons")
-public class Coupons {
+@Builder
+public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

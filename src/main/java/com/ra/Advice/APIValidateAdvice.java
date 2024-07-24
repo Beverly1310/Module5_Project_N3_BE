@@ -3,7 +3,6 @@ package com.ra.advice;
 
 import com.ra.model.dto.res.DataError;
 import org.hibernate.exception.DataException;
-import org.springframework.core.type.classreading.ClassFormatException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

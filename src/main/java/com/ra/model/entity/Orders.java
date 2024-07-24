@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.ManyToAny;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -39,7 +38,7 @@ public class Orders {
     private String ward;
     @ManyToOne
     @JoinColumn(name = "coupons_id",referencedColumnName = "id")
-    private Coupons coupons;
+    private Coupon voucher;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
