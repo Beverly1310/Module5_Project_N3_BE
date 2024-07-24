@@ -1,14 +1,40 @@
 package com.ra.controller;
 
+
 import com.ra.model.dto.req.*;
 import com.ra.model.dto.res.ProductResponse;
 import com.ra.model.entity.*;
+
+import com.ra.model.dto.req.BannerAdd;
+import com.ra.model.dto.req.BannerEdit;
+import com.ra.model.dto.req.CategoryForm;
+import com.ra.model.dto.req.ProductForm;
+import com.ra.model.dto.res.*;
+import com.ra.model.dto.res.BrandFormResponse;
+import com.ra.model.dto.res.CategoryFormResponse;
+import com.ra.model.dto.res.ProductPageResponse;
+import com.ra.model.dto.res.ProductResponse;
+import com.ra.model.entity.Banner;
+import com.ra.model.entity.Category;
+
+import com.ra.model.entity.Orders;
+
+import com.ra.model.entity.User;
+import com.ra.service.*;
+import com.ra.service.AdminService;
+import com.ra.service.IBrandService;
+
+
 import com.ra.service.ICategoryService;
 import com.ra.service.IProductService;
 import jakarta.persistence.criteria.Order;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+
+
+import com.ra.model.entity.User;
+
 import com.ra.service.AdminService;
 
 import org.springframework.data.domain.Pageable;
@@ -26,6 +52,7 @@ public class AdminController {
     private final ICategoryService categoryService;
     private final IProductService productService;
     private final AdminService adminService;
+    private final IColorService colorService;
 
     //    Category management
 
@@ -88,6 +115,21 @@ public class AdminController {
     }
 
     //Add
+
+    @GetMapping("product/add")
+    public ResponseEntity<ProductForm> addNewProduct() {
+        List<CategoryFormResponse> categories = categoryService.getAllForInput();
+        List<BrandFormResponse> brands = brandService.getAllForInput();
+        List<ColorFormResponse> colors=colorService.getAllForInput();
+        ProductForm productForm = ProductForm.builder()
+                .categoryList(categories)
+                .brandList(brands)
+                .colorList(colors)
+                .build();
+
+        return ResponseEntity.ok(productForm);
+    }
+
     @PostMapping("/product/add")
     public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductForm productForm) {
         productService.add(productForm);

@@ -3,6 +3,7 @@ package com.ra.service.imp;
 import com.ra.model.cons.RoleName;
 import com.ra.model.dto.req.BannerAdd;
 import com.ra.model.dto.req.BannerEdit;
+
 import com.ra.model.dto.req.CouponAdd;
 import com.ra.model.dto.req.CouponEdit;
 import com.ra.model.entity.Banner;
@@ -10,6 +11,15 @@ import com.ra.model.entity.Coupon;
 import com.ra.model.entity.Orders;
 import com.ra.model.entity.User;
 import com.ra.repository.*;
+
+import com.ra.model.entity.Banner;
+import com.ra.model.entity.Orders;
+import com.ra.model.entity.User;
+import com.ra.repository.BannerRepository;
+import com.ra.repository.OrdersRepository;
+import com.ra.repository.RoleRepository;
+import com.ra.repository.UserRepository;
+
 import com.ra.service.AdminService;
 import com.ra.util.FileUploadService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +43,9 @@ public class AdminServiceImpl implements AdminService {
     private final BannerRepository bannerRepository;
     private final FileUploadService fileUploadService;
     private final OrdersRepository ordersRepository;
+
     private final CouponRepository couponRepository;
+
 
     @Override
     public Page<User> getUserWithPagingAndSorting(Pageable pageable, String direction, String search) {
@@ -89,10 +101,12 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
+
     @Override
     public List<Banner> getBanners() {
         List<Banner> banners = bannerRepository.findAll();
         return banners;
+
     }
 
     @Override
@@ -103,7 +117,9 @@ public class AdminServiceImpl implements AdminService {
                 .description(bannerAdd.getDescription())
                 .status(true)
                 .build();
+
         if (bannerAdd.getImage() != null && !bannerAdd.getImage().isEmpty()) {
+
             banner.setImage(fileUploadService.uploadFileToServer(bannerAdd.getImage()));
         } else {
             banner.setImage(null);
@@ -127,6 +143,7 @@ public class AdminServiceImpl implements AdminService {
                 banner.setDescription(bannerEdit.getDescription());
             }
             if (bannerEdit.getImage() != null && !bannerEdit.getImage().isEmpty()) {
+
                 banner.setImage(fileUploadService.uploadFileToServer(bannerEdit.getImage()));
             }
             return bannerRepository.save(banner);
@@ -197,4 +214,5 @@ public class AdminServiceImpl implements AdminService {
             throw new RuntimeException("Coupon not found");
         }
     }
+
 }

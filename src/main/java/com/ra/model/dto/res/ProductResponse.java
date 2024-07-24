@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,10 +19,8 @@ public class ProductResponse {
 
     private String description;
 
-    private Double unitPrice;
     private String brandName;
     private String categoryName;
-    private Integer stockQuantity;
 
     private String image;
 
@@ -29,5 +28,6 @@ public class ProductResponse {
 
     private LocalDate updatedAt;
     private boolean status;
-
+    private boolean onWishlist;
+    List<ProductDetailResponse> productDetails;
 }
