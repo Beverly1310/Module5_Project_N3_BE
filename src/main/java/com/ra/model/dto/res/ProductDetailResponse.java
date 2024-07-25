@@ -16,7 +16,7 @@ public class ProductDetailResponse {
     private String image;
     private String productDetailName;
     private boolean status;
-    private int stock;
+    private Long stock;
     private double unitPrice;
     private String color;
     private Long productId;

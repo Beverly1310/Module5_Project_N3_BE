@@ -20,4 +20,6 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     @Query("SELECT p FROM OrderDetail od JOIN od.id.productDetail.product p GROUP BY p.id ORDER BY SUM(od.orderQuantity) DESC limit 5")
     List<Product> findTop5MostSoldProducts();
+    @Query("SELECT p FROM Product p WHERE p.id!=:productId and (p.category.categoryName = :categoryName OR p.brand.brandName = :brandName)")
+    List<Product> findRelatedProducts(Long productId, String categoryName,String brandName,Pageable pageable);
 }
