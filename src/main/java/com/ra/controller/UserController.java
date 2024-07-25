@@ -1,5 +1,6 @@
 package com.ra.controller;
 
+import com.ra.model.dto.req.CartItemRequest;
 import com.ra.model.dto.req.ChangePasswordRequest;
 import com.ra.model.dto.req.CommentRequest;
 import com.ra.model.dto.req.UserEdit;
@@ -32,6 +33,7 @@ public class UserController {
     private final UserService userService;
     private final IWishListService wishListService;
     private final ICommentService commentService;
+    private final ICartService cartService;
 
     //    Display categories and products
     @GetMapping("/category/{id}")
@@ -55,6 +57,12 @@ public class UserController {
         ProductResponse productResponse = productService.findById(id);
         productResponse.setOnWishlist(wishListService.isFavourite(id));
         return ResponseEntity.ok(productResponse);
+    }
+
+//    Get related products
+    @GetMapping("product/{id}/related")
+    public ResponseEntity<?> getRelatedProducts(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getRelatedProducts(id));
     }
 
     //    View comments
@@ -111,13 +119,49 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    //    Shopping cart
+    @GetMapping("/cart")
+    public ResponseEntity<?> getAllCartItems() {
+        CartListResponse cartListResponse=cartService.getAllItemsInCart();
+        return ResponseEntity.ok(cartListResponse);
+    }
 
+    @GetMapping("/getCartCount")
+    public ResponseEntity<?> getCartCount() {
+        return ResponseEntity.ok(cartService.cartNumber());
+    }
+
+    @PostMapping("/cart/add")
+    public ResponseEntity<?> addItemToCart(@Valid @RequestBody CartItemRequest request){
+        cartService.add(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/cart/update")
+    public ResponseEntity<?> changeItemQuantity(@Valid @RequestBody CartItemRequest request){
+        cartService.changeQuantity(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/cart/{cartId}")
+    public ResponseEntity<?> removeItemFromCart(@PathVariable Long cartId){
+        cartService.deleteItemFromCart(cartId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("cart/clearAll")
+    public ResponseEntity<?> clearAllCartItems(){
+        cartService.deleteAllItems();
+        return ResponseEntity.ok().build();
+    }
     //  Wishlist
     @PostMapping("/product/{productId}/wishlist")
     public ResponseEntity<?> addToWishlist(@PathVariable long productId) {
         wishListService.addOrDeleteFromWishList(productId);
         return ResponseEntity.ok().build();
     }
+
+
 
     @PutMapping("/edit")
     public ResponseEntity<ResponseData<User>> editAccount(@Valid @ModelAttribute UserEdit userEdit) {
