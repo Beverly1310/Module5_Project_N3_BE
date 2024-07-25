@@ -2,6 +2,7 @@ package com.ra.controller;
 
 import com.ra.model.dto.req.ChangePasswordRequest;
 import com.ra.model.dto.req.CommentRequest;
+import com.ra.model.dto.req.FormReview;
 import com.ra.model.dto.req.UserEdit;
 import com.ra.model.dto.res.*;
 import com.ra.model.entity.*;
@@ -155,5 +156,15 @@ public class UserController {
     public ResponseEntity<?> getPaymentTotalPrice(@RequestParam(value = "couponCode", required = false) String couponCode) {
         TotalPriceRes totalPrice = userService.getPaymentTotalPrice(couponCode);
         return new ResponseEntity<>(new ResponseData<>("success",totalPrice,HttpStatus.OK ), HttpStatus.OK);
+    }
+    @GetMapping("/payhistory")
+    public ResponseEntity<?> getPayHistory(){
+        List<ProductDetail> productDetails = userService.findSuccessOrder();
+        return new ResponseEntity<>(new ResponseData<>("success",productDetails,HttpStatus.OK ), HttpStatus.OK);
+    }
+    @PostMapping("/givefeedback")
+    public ResponseEntity<?> getGiveFeedback(@RequestBody FormReview formReview){
+        Review review = userService.createReview(formReview);
+        return new ResponseEntity<>(new ResponseData<>("success",review,HttpStatus.OK ), HttpStatus.OK);
     }
 }
