@@ -1,16 +1,10 @@
 package com.ra.service;
 
 
-import com.ra.model.dto.req.BannerAdd;
-import com.ra.model.dto.req.BannerEdit;
+import com.ra.model.dto.req.*;
 
-import com.ra.model.dto.req.CouponAdd;
-import com.ra.model.dto.req.CouponEdit;
+import com.ra.model.entity.*;
 import com.ra.model.entity.Banner;
-import com.ra.model.entity.Coupon;
-import com.ra.model.entity.Banner;
-import com.ra.model.entity.Orders;
-import com.ra.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -30,5 +24,9 @@ public interface AdminService {
     Coupon addCoupon(CouponAdd couponAdd);
     void deleteCoupon(Long id);
     Coupon updateCoupon(CouponEdit couponEdit);
+    List<Event> getEvents();
+    Event addEvent(EventAdd eventAdd);
+    void deleteEvent(Long id);
+    Event updateEvent(EventEdit eventEdit);
 
 }
