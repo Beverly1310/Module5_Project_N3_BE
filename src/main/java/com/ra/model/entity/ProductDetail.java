@@ -1,5 +1,6 @@
 package com.ra.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,10 +22,12 @@ public class ProductDetail {
     private boolean status;
     private Long stock;
     private double unitPrice;
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "color_Id", referencedColumnName = "id")
     private Color color;
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "product_Id", referencedColumnName = "id")
     private Product product;
 }

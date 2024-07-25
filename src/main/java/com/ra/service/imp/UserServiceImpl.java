@@ -2,6 +2,7 @@ package com.ra.service.imp;
 
 import com.ra.model.cons.OrderStatus;
 import com.ra.model.dto.req.ChangePasswordRequest;
+import com.ra.model.dto.req.FormReview;
 import com.ra.model.dto.req.UserEdit;
 import com.ra.model.dto.res.TotalPriceRes;
 import com.ra.model.entity.*;
@@ -17,10 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +35,7 @@ public class UserServiceImpl implements UserService {
     private final EventRepository eventRepository;
     private final OrdersRepository ordersRepository;
     private final OrderDetailRepository orderDetailRepository;
-
+    private final ReviewRepository reviewRepository;
     @Override
     public boolean changePassword(ChangePasswordRequest changePasswordRequest) {
         try {
@@ -196,5 +194,23 @@ public class UserServiceImpl implements UserService {
         } else {
             return new TotalPriceRes(0D,0D);
         }
+    }
+
+    @Override
+    public List<ProductDetail> findSuccessOrder() {
+        return orderDetailRepository.findByUserIdAndOrderStatus(getCurrentUser().getId(), OrderStatus.SUCCESS);
+    }
+
+    @Override
+    public Review createReview(FormReview formReview) {
+        Review review = Review.builder()
+                .comments(formReview.getComment())
+                .createdAt(LocalDate.now())
+                .rating(formReview.getRating())
+                .status(true)
+                .productDetail(productDetailRepository.findById(formReview.getProductDetailId()).orElseThrow(()->new NoSuchElementException("Product type not found")))
+                .build();
+
+        return reviewRepository.save(review);
     }
 }
