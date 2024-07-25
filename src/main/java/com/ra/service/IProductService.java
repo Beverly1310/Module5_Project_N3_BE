@@ -19,6 +19,7 @@ public interface IProductService {
 
     ProductResponse findById(Long id);
     List<ProductResponse> getNewest();
+    List<ProductResponse> getRelatedProducts(Long id);
     Page<ProductResponse> getAllProductsOnSale(String keyword, int page, int size, String sortBy, String sortDirection);
     List<ProductResponse> getMostSold();
     List<ProductResponse> getMostNotable();

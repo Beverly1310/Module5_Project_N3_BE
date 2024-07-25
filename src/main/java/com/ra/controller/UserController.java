@@ -5,13 +5,11 @@ import com.ra.model.dto.req.ChangePasswordRequest;
 import com.ra.model.dto.req.CommentRequest;
 import com.ra.model.dto.req.UserEdit;
 import com.ra.model.dto.res.*;
-import com.ra.model.entity.User;
+import com.ra.model.entity.*;
 import com.ra.service.*;
 import com.ra.model.dto.res.CategoryWithProductsDTO;
 import com.ra.model.dto.res.ResponseData;
-import com.ra.model.entity.Product;
 import com.ra.model.entity.User;
-import com.ra.model.entity.WishList;
 import com.ra.service.ICategoryService;
 import com.ra.service.UserService;
 import jakarta.validation.Valid;
@@ -70,7 +68,7 @@ public class UserController {
     public ResponseEntity<?> viewComments(@PathVariable Long productId,
                                           @RequestParam(defaultValue = "1") int page,
                                           @RequestParam(defaultValue = "5") int size) {
-        CommentSection commentSection = commentService.findAllByProduct(productId, page-1, size);
+        CommentSection commentSection = commentService.findAllByProduct(productId, page - 1, size);
 
         return ResponseEntity.ok(commentSection);
     }
@@ -168,19 +166,38 @@ public class UserController {
         User user = userService.editUser(userEdit);
         return new ResponseEntity<>(new ResponseData<>("success", user, HttpStatus.OK), HttpStatus.OK);
     }
+
     @PutMapping("/account/change-password")
     public ResponseEntity<ResponseData<String>> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         userService.changePassword(changePasswordRequest);
         return new ResponseEntity<>(new ResponseData<>("success", "Success", HttpStatus.OK), HttpStatus.OK);
     }
+
     @GetMapping("/wishlist")
-    public  ResponseEntity<ResponseData<List<Product>>> getWishList() {
+    public ResponseEntity<ResponseData<List<Product>>> getWishList() {
         List<Product> wishLists = userService.getWishList();
         return new ResponseEntity<>(new ResponseData<>("success", wishLists, HttpStatus.OK), HttpStatus.OK);
     }
+
     @DeleteMapping("/wishlist/{productId}")
     public ResponseEntity<ResponseData<List<Product>>> deleteWishList(@PathVariable Long productId) {
         List<Product> products = userService.removeProductFromWishList(productId);
-        return new ResponseEntity<>(new ResponseData<>("success", products , HttpStatus.OK), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseData<>("success", products, HttpStatus.OK), HttpStatus.OK);
+    }
+
+    @PostMapping("/payment")
+    public ResponseEntity<?> doPayment(@RequestParam(value = "couponCode", required = false) String couponCode, @RequestParam(value = "note", required = false) String note, @RequestParam(value = "addressId", required = false) Long addressId) {
+        Orders orders = userService.checkOutCart(couponCode, note,addressId);
+        return new ResponseEntity<>(new ResponseData<>("success", orders, HttpStatus.OK), HttpStatus.OK);
+    }
+    @GetMapping("/payment/address")
+    public ResponseEntity<ResponseData<?>> getPaymentAddress() {
+        List<Address> addresses = userService.getPaymentAddress();
+        return new ResponseEntity<>(new ResponseData<>("success",addresses,HttpStatus.OK ), HttpStatus.OK);
+    }
+    @GetMapping("/payment/totalPrice")
+    public ResponseEntity<?> getPaymentTotalPrice(@RequestParam(value = "couponCode", required = false) String couponCode) {
+        TotalPriceRes totalPrice = userService.getPaymentTotalPrice(couponCode);
+        return new ResponseEntity<>(new ResponseData<>("success",totalPrice,HttpStatus.OK ), HttpStatus.OK);
     }
 }

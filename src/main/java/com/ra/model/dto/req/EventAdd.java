@@ -19,9 +19,6 @@ import java.time.LocalDate;
 public class EventAdd {
     @NotBlank(message = "Discount required")
     private String discount;
-    @NotNull(message = "End date required")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
     @NotNull(message = "Start date required")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Future(message = "Date must be in future")

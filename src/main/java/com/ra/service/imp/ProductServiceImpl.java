@@ -3,6 +3,7 @@ package com.ra.service.imp;
 import com.ra.model.dto.req.ProductDetailRequest;
 import com.ra.model.dto.req.ProductForm;
 import com.ra.model.dto.res.ImageFormResponse;
+import com.ra.model.dto.res.ProductDetailResponse;
 import com.ra.model.dto.res.ProductResponse;
 import com.ra.model.entity.*;
 import com.ra.repository.*;
@@ -268,6 +269,15 @@ public class ProductServiceImpl implements IProductService {
         return newestProducts;    }
 
     @Override
+    public List<ProductResponse> getRelatedProducts(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid product ID"));
+        Pageable pageable = PageRequest.of(0, 4);
+        List<Product> products = productRepository.findRelatedProducts(id,product.getCategory().getCategoryName(),product.getBrand().getBrandName(), pageable);
+        return products.stream().map(this::getResponse).toList();
+    }
+
+    @Override
     public Page<ProductResponse> getAllProductsOnSale(String keyword, int page, int size, String sortBy, String sortDirection) {
         return null;
     }
@@ -287,6 +297,19 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductResponse getResponse(Product product) {
+        List<ProductDetailResponse> productDetailResponses = new ArrayList<>();
+        for (ProductDetail productDetail : productDetailRepository.findAllByProductId(product.getId())) {
+            productDetailResponses.add(ProductDetailResponse.builder()
+                    .productId(product.getId())
+                    .productDetailId(productDetail.getId())
+                    .color(productDetail.getColor().getColorName())
+                    .image(productDetail.getImage())
+                    .stock(productDetail.getStock())
+                    .productDetailName(productDetail.getProductDetailName())
+                    .status(productDetail.isStatus())
+                    .unitPrice(productDetail.getUnitPrice())
+                    .build());
+        }
         return ProductResponse.builder()
                 .id(product.getId())
                 .sku(product.getSku())
@@ -297,6 +320,8 @@ public class ProductServiceImpl implements IProductService {
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .image(product.getImage()).status(product.isStatus())
+                .imageList(imageRepository.findAllByProductId(product.getId()))
+                .productDetails(productDetailResponses)
                 .build();
     }
 }

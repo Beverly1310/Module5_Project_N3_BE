@@ -2,10 +2,7 @@ package com.ra.model.entity;
 
 import com.ra.model.cons.OrderStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -16,6 +13,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "orders")
+@Builder
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +36,7 @@ public class Orders {
     private String ward;
     @ManyToOne
     @JoinColumn(name = "coupons_id",referencedColumnName = "id")
-    private Coupon voucher;
+    private Coupon coupon;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private User user;
