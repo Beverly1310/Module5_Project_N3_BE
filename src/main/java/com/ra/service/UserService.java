@@ -2,9 +2,8 @@ package com.ra.service;
 
 import com.ra.model.dto.req.ChangePasswordRequest;
 import com.ra.model.dto.req.UserEdit;
-import com.ra.model.entity.Product;
-import com.ra.model.entity.User;
-import com.ra.model.entity.WishList;
+import com.ra.model.dto.res.TotalPriceRes;
+import com.ra.model.entity.*;
 
 import java.util.List;
 
@@ -16,4 +15,10 @@ public interface UserService {
     List<Product> getWishList();
 
     List<Product> removeProductFromWishList(Long productId);
+
+    Orders checkOutCart(String couponCode, String note,Long addressId);
+
+    List<Address> getPaymentAddress();
+
+    TotalPriceRes getPaymentTotalPrice(String couponCode);
 }

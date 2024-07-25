@@ -19,8 +19,6 @@ public class Event {
     private Long id;
     private String discount;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
     private boolean status;
     private String title;

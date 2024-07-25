@@ -14,7 +14,7 @@ import lombok.*;
 public class OrderDetail {
     @EmbeddedId
     private OrderDetailId id;
-    private int orderQuantity;
+    private Long orderQuantity;
     private String orderDetailName;
     private Double unitPrice;
 
