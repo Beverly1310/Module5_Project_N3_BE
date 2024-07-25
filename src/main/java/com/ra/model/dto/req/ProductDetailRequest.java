@@ -19,7 +19,7 @@ public class ProductDetailRequest {
     @NotBlank(message = "Name cannot be empty!")
     private String productDetailName;
     @PositiveOrZero(message = "Stocks must be equal to or greater than 0!")
-    private int stock;
+    private Long stock;
     @PositiveOrZero(message = "Price must be equal to or greater than 0!")
     private boolean status;
     private double unitPrice;

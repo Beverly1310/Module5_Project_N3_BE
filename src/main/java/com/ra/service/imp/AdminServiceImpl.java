@@ -219,7 +219,6 @@ public class AdminServiceImpl implements AdminService {
         Event event = Event.builder()
                 .discount(eventAdd.getDiscount())
                 .startDate(eventAdd.getStartDate())
-                .endDate(eventAdd.getEndDate())
                 .status(true)
                 .title(eventAdd.getTitle())
                 .build();
@@ -237,10 +236,6 @@ public class AdminServiceImpl implements AdminService {
         if (event != null) {
             if (eventEdit.getDiscount() != null && !eventEdit.getDiscount().isEmpty()) {
                 event.setDiscount(eventEdit.getDiscount());
-            }
-
-            if (eventEdit.getEndDate() != null) {
-                event.setEndDate(eventEdit.getEndDate());
             }
             if (eventEdit.getStartDate() != null) {
                 event.setStartDate(eventEdit.getStartDate());
