@@ -6,6 +6,7 @@ import com.ra.model.dto.req.*;
 
 import com.ra.model.dto.res.OrderStatistics;
 import com.ra.model.dto.res.SoldProduct;
+
 import com.ra.model.entity.*;
 import com.ra.repository.*;
 
@@ -273,6 +274,7 @@ public class AdminServiceImpl implements AdminService {
         return orderStatistics;
     }
 
+
     @Override
     public List<SoldProduct> getSoldProduct(Integer year) {
         List<SoldProduct> soldProducts = new ArrayList<>();
@@ -292,4 +294,5 @@ public class AdminServiceImpl implements AdminService {
         }
         return soldProducts;
     }
+
 }
