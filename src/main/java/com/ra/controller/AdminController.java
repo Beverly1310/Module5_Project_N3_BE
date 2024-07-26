@@ -247,5 +247,10 @@ public class AdminController {
         Event event = adminService.updateEvent(eventEdit);
         return ResponseEntity.ok().body(event);
     }
+    @GetMapping("/orderstatistics")
+    public ResponseEntity<List<OrderStatistics>> getAllOrderStatistics(@RequestParam(value = "year",required = false)Integer year) {
+        List<OrderStatistics> orderStatistics = adminService.getOrderStatistics(year);
+        return ResponseEntity.ok().body(orderStatistics);
+    }
 }
 
