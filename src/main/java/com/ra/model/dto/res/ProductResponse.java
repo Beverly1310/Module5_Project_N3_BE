@@ -1,5 +1,6 @@
 package com.ra.model.dto.res;
 
+import com.ra.model.entity.Image;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,5 +30,6 @@ public class ProductResponse {
     private LocalDate updatedAt;
     private boolean status;
     private boolean onWishlist;
+    List<Image> imageList;
     List<ProductDetailResponse> productDetails;
 }
