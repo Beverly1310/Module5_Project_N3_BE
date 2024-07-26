@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Setter
 @Builder
 @Entity
+@Table(name = "message")
+
 @AllArgsConstructor
 @NoArgsConstructor
 public class Message {

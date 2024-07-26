@@ -2,41 +2,12 @@ package com.ra.controller;
 
 
 import com.ra.model.dto.req.*;
-import com.ra.model.dto.res.ProductResponse;
-import com.ra.model.entity.*;
-
-import com.ra.model.dto.req.BannerAdd;
-import com.ra.model.dto.req.BannerEdit;
-import com.ra.model.dto.req.CategoryForm;
-import com.ra.model.dto.req.ProductForm;
 import com.ra.model.dto.res.*;
-import com.ra.model.dto.res.BrandFormResponse;
-import com.ra.model.dto.res.CategoryFormResponse;
-import com.ra.model.dto.res.ProductPageResponse;
-import com.ra.model.dto.res.ProductResponse;
-import com.ra.model.entity.Banner;
-import com.ra.model.entity.Category;
-
-import com.ra.model.entity.Orders;
-
-import com.ra.model.entity.User;
+import com.ra.model.entity.*;
 import com.ra.service.*;
-import com.ra.service.AdminService;
-import com.ra.service.IBrandService;
-
-
-import com.ra.service.ICategoryService;
-import com.ra.service.IProductService;
-import jakarta.persistence.criteria.Order;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-
-
-import com.ra.model.entity.User;
-
-import com.ra.service.AdminService;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -117,6 +88,7 @@ public class AdminController {
         response.setTotalPages(productResponses.getTotalPages());
         return ResponseEntity.ok(response);
     }
+
 
     //Add
 
@@ -212,17 +184,22 @@ public class AdminController {
     public ResponseEntity<?> getOrders(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "asc") String sortDirection) {
-        List<OrderResponse> orders = orderService.findAll(page - 1, size, sortDirection);
+            @RequestParam(defaultValue = "createdAt") String sortField,
+            @RequestParam(defaultValue = "desc") String sortDirection) {
+        Page<OrderResponse> orders = orderService.findAll(page - 1, size, sortField, sortDirection);
         return ResponseEntity.ok(orders);
     }
+//  View in details
 
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<?> viewOrderInDetails(@PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.viewFullDetail(orderId));
+    }
 //    Change status
     @PutMapping("/orders/{id}")
     public ResponseEntity<?> updateOrder(@PathVariable Long id,@RequestParam String status){
         orderService.changeStatus(id,status);
         return ResponseEntity.ok().build();
-
     };
 
     @GetMapping("/coupon")

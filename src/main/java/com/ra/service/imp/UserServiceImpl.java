@@ -147,11 +147,11 @@ public class UserServiceImpl implements UserService {
                 if (productDetail.getStock() < orderDetail.getOrderQuantity()) {
                     throw new RuntimeException("Product quantity less than order quantity");
                 } else {
-//                    productDetail.setStock(productDetail.getStock()-orderDetail.getOrderQuantity());
+                    productDetail.setStock(productDetail.getStock()-orderDetail.getOrderQuantity());
                 }
                 productDetailRepository.save(productDetail);
                 orderDetailRepository.save(orderDetail);
-//                shoppingCartRepository.delete(shoppingCart);
+                shoppingCartRepository.delete(shoppingCart);
             }
 
             return orders;

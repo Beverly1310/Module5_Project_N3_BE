@@ -118,6 +118,17 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    //    Newest products
+    @GetMapping("/product/newest")
+    public ResponseEntity<?> getNewestProducts() {
+        return ResponseEntity.ok(productService.getNewest());
+    }
+//    Most sold
+    @GetMapping("/product/mostSold")
+    public ResponseEntity<?> getMostSoldProducts() {
+        return ResponseEntity.ok(productService.getMostSold());
+    }
+
     //    Shopping cart
     @GetMapping("/cart")
     public ResponseEntity<?> getAllCartItems() {
