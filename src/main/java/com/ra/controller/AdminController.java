@@ -54,6 +54,7 @@ public class AdminController {
     private final AdminService adminService;
     private final IColorService colorService;
     private final IBrandService brandService;
+    private final IOrderService orderService;
     //    Category management
 
     //    Display all
@@ -104,14 +105,17 @@ public class AdminController {
     //    Product management
 //    Display all
     @GetMapping("/product")
-    public ResponseEntity<Page<ProductResponse>> getProducts(
+    public ResponseEntity<ProductPageResponse> getProducts(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
         Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
-        return ResponseEntity.ok(productResponses);
+        ProductPageResponse response = new ProductPageResponse();
+        response.setProducts(productResponses.getContent());
+        response.setTotalPages(productResponses.getTotalPages());
+        return ResponseEntity.ok(response);
     }
 
     //Add
@@ -203,10 +207,24 @@ public class AdminController {
         Banner banner = adminService.updateBanner(bannerEdit);
         return ResponseEntity.ok().body(banner);
     }
+//    Orders
     @GetMapping("/orders")
-    public ResponseEntity<List<Orders>> getAllOrders() {
-        return ResponseEntity.ok().body(adminService.getOrders());
+    public ResponseEntity<?> getOrders(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        List<OrderResponse> orders = orderService.findAll(page - 1, size, sortDirection);
+        return ResponseEntity.ok(orders);
     }
+
+//    Change status
+    @PutMapping("/orders/{id}")
+    public ResponseEntity<?> updateOrder(@PathVariable Long id,@RequestParam String status){
+        orderService.changeStatus(id,status);
+        return ResponseEntity.ok().build();
+
+    };
+
     @GetMapping("/coupon")
     public ResponseEntity<List<Coupon>> getAllCoupons() {
         List<Coupon> coupons = adminService.getCoupons();
