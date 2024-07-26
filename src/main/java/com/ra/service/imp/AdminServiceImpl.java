@@ -5,6 +5,8 @@ import com.ra.model.cons.RoleName;
 import com.ra.model.dto.req.*;
 
 import com.ra.model.dto.res.OrderStatistics;
+
+import com.ra.model.dto.res.SaleRevenue;
 import com.ra.model.dto.res.SoldProduct;
 
 import com.ra.model.entity.*;
@@ -274,7 +276,6 @@ public class AdminServiceImpl implements AdminService {
         return orderStatistics;
     }
 
-
     @Override
     public List<SoldProduct> getSoldProduct(Integer year) {
         List<SoldProduct> soldProducts = new ArrayList<>();
@@ -293,6 +294,27 @@ public class AdminServiceImpl implements AdminService {
             soldProducts.add(soldProduct);
         }
         return soldProducts;
+    }
+
+    @Override
+    public List<SaleRevenue> getSaleRevenue(Integer year) {
+        List<SaleRevenue> saleRevenues = new ArrayList<>();
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
+        for (int i = 1; i <=12 ; i++) {
+            Long saleRevenue = ordersRepository.getSaleRevenue(OrderStatus.SUCCESS,year,i);
+            if (saleRevenue==null){
+                saleRevenue= 0L;
+            }
+            SaleRevenue revenue = SaleRevenue.builder()
+                    .month("Tháng "+i)
+                    .revenue(saleRevenue)
+                    .build();
+            saleRevenues.add(revenue);
+        }
+        return saleRevenues;
+
     }
 
 }
