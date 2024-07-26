@@ -5,8 +5,10 @@ import com.ra.model.cons.RoleName;
 import com.ra.model.dto.req.*;
 
 import com.ra.model.dto.res.OrderStatistics;
+
 import com.ra.model.dto.res.SaleRevenue;
 import com.ra.model.dto.res.SoldProduct;
+
 import com.ra.model.entity.*;
 import com.ra.repository.*;
 
@@ -314,4 +316,5 @@ public class AdminServiceImpl implements AdminService {
         return saleRevenues;
 
     }
+
 }

@@ -270,15 +270,18 @@ public class AdminController {
         List<OrderStatistics> orderStatistics = adminService.getOrderStatistics(year);
         return ResponseEntity.ok().body(orderStatistics);
     }
+
     @GetMapping("/soldproduct")
     public ResponseEntity<List<SoldProduct>> getSoldProduct(@RequestParam(value = "year",required = false)Integer year) {
         List<SoldProduct> soldProduct = adminService.getSoldProduct(year);
         return ResponseEntity.ok().body(soldProduct);
     }
+
     @GetMapping("/salerevenue")
     public ResponseEntity<List<SaleRevenue>> getSaleRevenues(@RequestParam(value = "year",required = false)Integer year) {
         List<SaleRevenue> saleRevenue = adminService.getSaleRevenue(year);
         return ResponseEntity.ok().body(saleRevenue);
     }
+
 }
 
