@@ -4,6 +4,7 @@ package com.ra.service;
 import com.ra.model.dto.req.*;
 
 import com.ra.model.dto.res.OrderStatistics;
+import com.ra.model.dto.res.SaleRevenue;
 import com.ra.model.dto.res.SoldProduct;
 import com.ra.model.entity.*;
 import com.ra.model.entity.Banner;
@@ -50,4 +51,6 @@ public interface AdminService {
     List<OrderStatistics> getOrderStatistics(Integer year);
 
     List<SoldProduct> getSoldProduct(Integer year);
+
+    List<SaleRevenue> getSaleRevenue(Integer year);
 }

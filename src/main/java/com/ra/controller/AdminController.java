@@ -257,5 +257,10 @@ public class AdminController {
         List<SoldProduct> soldProduct = adminService.getSoldProduct(year);
         return ResponseEntity.ok().body(soldProduct);
     }
+    @GetMapping("/salerevenue")
+    public ResponseEntity<List<SaleRevenue>> getSaleRevenues(@RequestParam(value = "year",required = false)Integer year) {
+        List<SaleRevenue> saleRevenue = adminService.getSaleRevenue(year);
+        return ResponseEntity.ok().body(saleRevenue);
+    }
 }
 
