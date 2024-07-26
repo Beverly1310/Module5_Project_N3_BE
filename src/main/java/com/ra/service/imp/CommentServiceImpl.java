@@ -118,6 +118,7 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
+
     public void toggleDisplayCommentDetail(Long commentDetailId) {
         // Fetch the comment detail by ID
         CommentDetail commentDetail = commentDetailRepository.findById(commentDetailId)
@@ -131,6 +132,7 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
+    @Transactional
     public void deleteCommentChain(Long commentId) {
         // Fetch the comment by ID
         Comment comment = commentRepository.findById(commentId)
