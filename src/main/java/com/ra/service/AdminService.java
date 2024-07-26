@@ -3,6 +3,7 @@ package com.ra.service;
 
 import com.ra.model.dto.req.*;
 
+import com.ra.model.dto.res.OrderStatistics;
 import com.ra.model.entity.*;
 import com.ra.model.entity.Banner;
 import org.springframework.data.domain.Page;
@@ -28,5 +29,5 @@ public interface AdminService {
     Event addEvent(EventAdd eventAdd);
     void deleteEvent(Long id);
     Event updateEvent(EventEdit eventEdit);
-
+    List<OrderStatistics> getOrderStatistics(Integer year);
 }

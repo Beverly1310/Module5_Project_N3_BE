@@ -1,8 +1,10 @@
 package com.ra.service.imp;
 
+import com.ra.model.cons.OrderStatus;
 import com.ra.model.cons.RoleName;
 import com.ra.model.dto.req.*;
 
+import com.ra.model.dto.res.OrderStatistics;
 import com.ra.model.entity.*;
 import com.ra.repository.*;
 
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -248,5 +251,24 @@ public class AdminServiceImpl implements AdminService {
         } else {
             throw new RuntimeException("Coupon not found");
         }
+    }
+
+    @Override
+    public List<OrderStatistics> getOrderStatistics(Integer year) {
+        List<OrderStatistics> orderStatistics = new ArrayList<>();
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
+        for (int i = 1; i <=12 ; i++) {
+            Long ordersConfirm = ordersRepository.getOrdersByStatusAndYear(OrderStatus.SUCCESS,year,i);
+            Long ordersCancel = ordersRepository.getOrdersByStatusAndYear(OrderStatus.CANCEL,year,i);
+            OrderStatistics orderStatistic = OrderStatistics.builder()
+                    .month("Tháng "+i)
+                    .cancelOrder(ordersCancel)
+                    .successOrder(ordersConfirm)
+                    .build();
+            orderStatistics.add(orderStatistic);
+        }
+        return orderStatistics;
     }
 }
