@@ -5,6 +5,8 @@ import com.ra.model.cons.RoleName;
 import com.ra.model.dto.req.*;
 
 import com.ra.model.dto.res.OrderStatistics;
+import com.ra.model.dto.res.SoldProduct;
+
 import com.ra.model.entity.*;
 import com.ra.repository.*;
 
@@ -271,4 +273,26 @@ public class AdminServiceImpl implements AdminService {
         }
         return orderStatistics;
     }
+
+
+    @Override
+    public List<SoldProduct> getSoldProduct(Integer year) {
+        List<SoldProduct> soldProducts = new ArrayList<>();
+        if (year == null) {
+            year = LocalDate.now().getYear();
+        }
+        for (int i = 1; i <=12 ; i++) {
+            Long soldProductNumber = ordersRepository.countByStatusAndYear(OrderStatus.SUCCESS,year,i);
+            if (soldProductNumber==null){
+                soldProductNumber= 0L;
+            }
+            SoldProduct soldProduct = SoldProduct.builder()
+                    .month("Tháng "+i)
+                    .soldQuantity(soldProductNumber)
+                    .build();
+            soldProducts.add(soldProduct);
+        }
+        return soldProducts;
+    }
+
 }
