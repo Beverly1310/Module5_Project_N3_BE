@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -40,14 +41,14 @@ public class User {
     private String avatar="https://bestnycacupuncturist.com/wp-content/uploads/2016/11/anonymous-avatar-sm.jpg";
     @Column(name = "created_at")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date createdAt=new Date();
+    private LocalDate createdAt=LocalDate.now();
     @Column(name = "updated_at")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date updatedAt=new Date();
+    private LocalDate updatedAt=LocalDate.now();
     @Column(name = "is_delete")
     private Boolean isDeleted=false;
     private Double point;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
