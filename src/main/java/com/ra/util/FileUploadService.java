@@ -1,4 +1,4 @@
-package com.ra.project.util;
+package com.ra.util;
 
 import com.google.cloud.storage.*;
 import jakarta.servlet.ServletContext;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application-dev.properties")
 public class FileUploadService
 {
     @Value("${bucketName}")
