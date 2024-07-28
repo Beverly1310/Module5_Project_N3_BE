@@ -15,6 +15,5 @@ import java.util.List;
 public class CommentSection {
     List<CommentResponse> comments;
     boolean userCommentExists;
-    int totalPages;
-    CommentResponse userComment;
+    boolean isModerator;
 }

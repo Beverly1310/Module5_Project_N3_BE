@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    @Query(countQuery = "SELECT count(c) FROM Comment c WHERE c.product.id = :productId AND c.user.id!= :userId")
-    Page<Comment> findAllByProductIdAndUserIdNot(Long productId, Long userId, Pageable pageable);
+    @Query(countQuery = "SELECT count(c) FROM Comment c WHERE c.product.id = :productId")
+    List<Comment> findAllByProductId(Long productId);
     Comment findAllByUserIdAndProductId(Long userId, Long productId);
 
     boolean existsByUserIdAndProductId(Long userId, Long productId);

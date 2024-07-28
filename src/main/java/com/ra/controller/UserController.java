@@ -1,18 +1,9 @@
 package com.ra.controller;
 
-import com.ra.model.dto.req.CartItemRequest;
-import com.ra.model.dto.req.ChangePasswordRequest;
-import com.ra.model.dto.req.CommentRequest;
-import com.ra.model.dto.req.FormReview;
-import com.ra.model.dto.req.UserEdit;
+import com.ra.model.dto.req.*;
 import com.ra.model.dto.res.*;
 import com.ra.model.entity.*;
 import com.ra.service.*;
-import com.ra.model.dto.res.CategoryWithProductsDTO;
-import com.ra.model.dto.res.ResponseData;
-import com.ra.model.entity.User;
-import com.ra.service.ICategoryService;
-import com.ra.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,6 +24,8 @@ public class UserController {
     private final IWishListService wishListService;
     private final ICommentService commentService;
     private final ICartService cartService;
+    private final IReviewService reviewService;
+    private final MessageService messageService;
 
     //    Display categories and products
     @GetMapping("/category/{id}")
@@ -47,6 +40,11 @@ public class UserController {
             dto.setMessage("No products found for this category.");
         }
         return ResponseEntity.ok(dto);
+    }
+//    Get categories list
+    @GetMapping("category/list")
+    public ResponseEntity<?> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllForInput());
     }
 
     //    product
@@ -66,27 +64,39 @@ public class UserController {
 
     //    View comments
     @GetMapping("/product/{productId}/comment")
-    public ResponseEntity<?> viewComments(@PathVariable Long productId,
-                                          @RequestParam(defaultValue = "1") int page,
-                                          @RequestParam(defaultValue = "5") int size) {
-        CommentSection commentSection = commentService.findAllByProduct(productId, page - 1, size);
+    public ResponseEntity<?> viewComments(@PathVariable Long productId) {
+        CommentSection commentSection = commentService.findAllByProduct(productId);
 
         return ResponseEntity.ok(commentSection);
     }
 
-    @PostMapping("/product/{productId}/comment")
+    //    Add new comment
+    @PostMapping("/comment/addComment")
     public ResponseEntity<?> addAComment(@Valid @RequestBody CommentRequest request) {
         commentService.addComment(request);
 
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/product/{productId}/commentDetail")
-    public ResponseEntity<?> addACommentDetail(@Valid @RequestBody CommentRequest request) {
+    @PostMapping("/comment/addCommentDetail/{commentId}")
+    public ResponseEntity<?> addACommentDetail(@PathVariable Long commentId, @Valid @RequestBody CommentRequest request) {
         commentService.addCommentDetail(request);
         return ResponseEntity.ok().build();
     }
 
+    //    Update existing comment
+    @PutMapping("/comment/updateComment/{id}")
+    public ResponseEntity<?> updateComment(@PathVariable Long id, @Valid @RequestBody CommentRequest request) {
+        commentService.updateComment(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/comment/updateCommentDetail/{id}")
+    public ResponseEntity<?> updateCommentDetail(@PathVariable Long id, @Valid @RequestBody CommentRequest request) {
+        commentService.updateCommentDetail(request);
+        return ResponseEntity.ok().build();
+    }
+//    Delete comment
 
     @DeleteMapping("/comment/{id}")
     public ResponseEntity<?> deleteComment(@PathVariable long id) {
@@ -100,15 +110,16 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    //    Display all
+    //    Display all products
     @GetMapping("/product")
     public ResponseEntity<ProductPageResponse> getProducts(
             @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
-        Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
+        Page<ProductResponse> productResponses = productService.findProductsByKeywordAndCategory(keyword, categoryId, page - 1, size, sortBy, sortDirection);
         ProductPageResponse response = new ProductPageResponse();
         response.setProducts(productResponses.getContent());
         response.setTotalPages(productResponses.getTotalPages());
@@ -117,6 +128,7 @@ public class UserController {
         }
         return ResponseEntity.ok(response);
     }
+
 
     //    Newest products
     @GetMapping("/product/newest")
@@ -128,6 +140,8 @@ public class UserController {
     public ResponseEntity<?> getMostSoldProducts() {
         return ResponseEntity.ok(productService.getMostSold());
     }
+
+
 
     //    Shopping cart
     @GetMapping("/cart")
@@ -158,6 +172,7 @@ public class UserController {
         cartService.deleteItemFromCart(cartId);
         return ResponseEntity.ok().build();
     }
+
 
     @DeleteMapping("cart/clearAll")
     public ResponseEntity<?> clearAllCartItems(){
@@ -217,9 +232,51 @@ public class UserController {
         List<ProductDetail> productDetails = userService.findSuccessOrder();
         return new ResponseEntity<>(new ResponseData<>("success",productDetails,HttpStatus.OK ), HttpStatus.OK);
     }
-    @PostMapping("/givefeedback")
-    public ResponseEntity<?> getGiveFeedback(@RequestBody FormReview formReview){
-        Review review = userService.createReview(formReview);
-        return new ResponseEntity<>(new ResponseData<>("success",review,HttpStatus.OK ), HttpStatus.OK);
+
+    //    Review
+//    Get all reviews by product details
+    @GetMapping("/review/{productDetailId}")
+    public ResponseEntity<?> getAllReviews(@PathVariable Long productDetailId) {
+        return ResponseEntity.ok(reviewService.getReviewListByProductDetail(productDetailId));
     }
+
+    //    Post new review
+    @PostMapping("/review/add")
+    public ResponseEntity<?> addReview(@Valid @RequestBody ReviewRequest request) {
+        reviewService.add(request);
+        return ResponseEntity.ok().build();
+    }
+
+    //    Update review
+    @PutMapping("/review/update/{reviewId}")
+    public ResponseEntity<?> updateReview(@PathVariable Long reviewId, @Valid @RequestBody ReviewRequest request) {
+        reviewService.update(request);
+        return ResponseEntity.ok().build();
+    }
+
+    //    Delete review
+    @DeleteMapping("/review/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
+        reviewService.delete(reviewId);
+        return ResponseEntity.ok().build();
+    }
+
+    //    View messages
+    @GetMapping("/message/countUnread")
+    public ResponseEntity<?> getUnreadCommentCount() {
+        return ResponseEntity.ok(messageService.countUnreadMessage());
+    }
+
+
+    @GetMapping("/message")
+    public ResponseEntity<?> getAllMessages() {
+        return ResponseEntity.ok(messageService.messages());
+    }
+
+    @PutMapping("/message/markAsRead/{token}")
+    public ResponseEntity<?> markAsRead(@PathVariable String token) {
+        messageService.markAsRead();
+        return ResponseEntity.ok().build();
+    }
+
 }

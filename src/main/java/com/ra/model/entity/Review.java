@@ -25,4 +25,7 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "product_detail_id",referencedColumnName = "id")
     private ProductDetail productDetail;
+    @ManyToOne
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    private User user;
 }
