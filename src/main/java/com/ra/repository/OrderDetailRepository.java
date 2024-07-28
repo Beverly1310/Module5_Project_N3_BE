@@ -14,6 +14,7 @@ import java.util.List;
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
     @Query("select od.id.productDetail from OrderDetail od join Orders o on od.id.order.id=o.id where o.status=:orderStatus and o.user.id=:userId")
     List<ProductDetail> findByUserIdAndOrderStatus(@Param("userId") Long userId, @Param("orderStatus") OrderStatus orderStatus);
+    List<OrderDetail> findAllByIdOrderId(Long orderId);
 
     List<OrderDetail> findAllByIdOrderId(Long orderId);
     boolean existsByIdOrderStatusAndIdOrderUserIdAndIdProductDetailId(OrderStatus orderStatus,Long userId,Long productDetailId);
