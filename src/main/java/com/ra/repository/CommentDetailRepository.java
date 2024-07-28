@@ -2,7 +2,9 @@ package com.ra.repository;
 
 import com.ra.model.entity.CommentDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +16,7 @@ public interface CommentDetailRepository extends JpaRepository<CommentDetail,Lon
     @Query("UPDATE CommentDetail c SET c.status = CASE WHEN c.status = true THEN false ELSE true END WHERE c.id = :id")
     void toggleCommentDetailDisplay(Long id);
 
+    @Modifying
     @Query("UPDATE CommentDetail c SET c.status = CASE WHEN c.status = true THEN false ELSE true END WHERE c.comment.id = :id")
-    void toggleCommentDetailDisplayByCommentId(Long id);
+    void toggleCommentDetailDisplayByCommentId(@Param("id") Long id);
 }

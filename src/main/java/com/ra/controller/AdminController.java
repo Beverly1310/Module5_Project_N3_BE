@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,8 @@ public class AdminController {
     private final IColorService colorService;
     private final IBrandService brandService;
     private final IOrderService orderService;
+    private final ICommentService commentService;
+    private final IReviewService reviewService;
     //    Category management
 
     //    Display all
@@ -82,7 +85,7 @@ public class AdminController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
-        Page<ProductResponse> productResponses = productService.findProductsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
+        Page<ProductResponse> productResponses = productService.findProductsByKeywordAndCategory(keyword, null,page - 1, size, sortBy, sortDirection);
         ProductPageResponse response = new ProductPageResponse();
         response.setProducts(productResponses.getContent());
         response.setTotalPages(productResponses.getTotalPages());
@@ -100,7 +103,6 @@ public class AdminController {
         ProductForm productForm = ProductForm.builder()
                 .categoryList(categories)
                 .brandList(brands)
-                .colorList(colors)
                 .build();
 
         return ResponseEntity.ok(productForm);
@@ -133,6 +135,56 @@ public class AdminController {
     @DeleteMapping("/product/{id}/delete")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+
+//    CRUD product details
+
+    // CRUD operations for product details
+
+    // Add product detail
+    @GetMapping("/productDetail/request")
+    public ResponseEntity<?> getProductDetailForm() {
+        ProductDetailRequest request=ProductDetailRequest.builder()
+                .colorList(colorService.getAllForInput())
+                .productList(productService.getInputList()).build();
+        return ResponseEntity.ok(request);
+    }
+    @PostMapping("/productDetail/add")
+    public ResponseEntity<?> addProductDetail(  @Valid @ModelAttribute ProductDetailRequest request) {
+        productService.addDetail(request);
+        return ResponseEntity.ok().build();
+    }
+
+    // Get product details by product ID with pagination
+    @GetMapping("/productDetail")
+    public ResponseEntity<Page<ProductDetailResponse>> getProductDetails(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        Page<ProductDetailResponse> productDetails = productService.findProductDetailsByKeyword(keyword, page - 1, size, sortBy, sortDirection);
+        return ResponseEntity.ok(productDetails);
+    }
+
+    //    Get specific productDetail
+    @GetMapping("/productDetail/{id}")
+    public ResponseEntity<?> getProductDetail(@PathVariable Long id){
+        return ResponseEntity.ok(productService.findDetailById(id));
+    }
+
+    // Update product detail
+    @PutMapping("/productDetail/{id}/update")
+    public ResponseEntity<?> updateProductDetail(@Valid @ModelAttribute ProductDetailRequest request, @PathVariable Long id) {
+        productService.updateDetail(request);
+        return ResponseEntity.ok().build();
+    }
+
+    // Delete product detail
+    @DeleteMapping("/productDetail/{id}")
+    public ResponseEntity<?> deleteProductDetail(@PathVariable Long id) {
+        productService.deleteDetail(id);
         return ResponseEntity.ok().build();
     }
 
@@ -259,6 +311,60 @@ public class AdminController {
         List<SaleRevenue> saleRevenue = adminService.getSaleRevenue(year);
         return ResponseEntity.ok().body(saleRevenue);
     }
+
+
+    //    Comment
+//    Toggle comments
+    @PutMapping("/comment/toggleComment/{commentId}")
+    public ResponseEntity<?> toggleComment(@PathVariable Long commentId) {
+        commentService.toggleDisplayCommentChain(commentId);
+        return ResponseEntity.ok().build();
+
+    }
+
+    @PutMapping("/comment/toggleCommentDetail/{commentDetailId}")
+    public ResponseEntity<?> toggleCommentDetail(@PathVariable Long commentDetailId) {
+        commentService.toggleDisplayCommentDetail(commentDetailId);
+        return ResponseEntity.ok().build();
+
+    }
+
+    //    Delete comments
+    @DeleteMapping("/comment/deleteComment/{commentId}")
+    public ResponseEntity<?> deleteCommentChain(@PathVariable Long commentId) {
+        commentService.deleteCommentChain(commentId);
+        return ResponseEntity.ok().build();
+
+    }
+
+    @DeleteMapping("/comment/deleteCommentDetail/{commentId}")
+    public ResponseEntity<?> deleteCommentDetail(@PathVariable Long commentId) {
+        commentService.deleteCommentDetail(commentId);
+        return ResponseEntity.ok().build();
+
+    }
+
+    //    Review
+    @PutMapping("/review/toggleReview/{reviewId}")
+    public ResponseEntity<?> toggleReview(@PathVariable Long reviewId) {
+        try {
+            reviewService.toggleReviewDisplay(reviewId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            // Log the exception to understand the issue
+            System.err.println("Error toggling review: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error toggling review: " + e.getMessage());
+        }
+    }
+
+    //    Delete
+    @DeleteMapping("/review/deleteReview/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId) {
+        reviewService.delete(reviewId);
+        return ResponseEntity.ok().build();
+
+    }
+
 
 }
 

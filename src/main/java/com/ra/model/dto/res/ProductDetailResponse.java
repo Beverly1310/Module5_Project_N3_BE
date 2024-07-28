@@ -11,13 +11,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ProductDetailResponse {
+public class    ProductDetailResponse {
     private Long productDetailId;
     private String image;
     private String productDetailName;
     private boolean status;
     private Long stock;
     private double unitPrice;
+    private Long colorId;
     private String color;
     private Long productId;
 }

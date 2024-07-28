@@ -29,9 +29,7 @@ public class ProductForm {
     private Long categoryId;
     List<CategoryFormResponse> categoryList;
     List<BrandFormResponse> brandList;
-    List<ColorFormResponse> colorList;
     private Long brandId;
-    List<ProductDetailRequest> detailRequests;
     List<ImageFormResponse> imageList;
     List<Long> imageIdList;
     List<MultipartFile> imageFileList;

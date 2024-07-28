@@ -1,5 +1,6 @@
 package com.ra.service.imp;
 
+import com.ra.model.cons.RoleName;
 import com.ra.model.dto.req.CommentRequest;
 import com.ra.model.dto.res.CommentDetailResponse;
 import com.ra.model.dto.res.CommentResponse;
@@ -13,10 +14,6 @@ import com.ra.repository.UserRepository;
 import com.ra.security.principal.CustomUserDetail;
 import com.ra.service.ICommentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +34,6 @@ public class CommentServiceImpl implements ICommentService {
         CustomUserDetail customUserDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return customUserDetail.getId();
     }
-
 
     @Override
     public CommentResponse findByUserAndProduct(Long userId, Long productId) {
@@ -75,16 +71,28 @@ public class CommentServiceImpl implements ICommentService {
     }
 
     @Override
-    public CommentSection findAllByProduct(Long id, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<Comment> commentPage = commentRepository.findAllByProductIdAndUserIdNot(id, currentUserId(), pageable);
+    public void updateComment(CommentRequest request) {
+        Comment comment = commentRepository.findById(request.getCommentId()).orElseThrow(() -> new RuntimeException("Comment does not exist!"));
+        comment.setComment(request.getComment());
+        commentRepository.save(comment);
+    }
+
+    @Override
+    public void updateCommentDetail(CommentRequest request) {
+        CommentDetail commentDetail = commentDetailRepository.findById(request.getCommentDetailId()).orElseThrow(() -> new RuntimeException("Comment does not exist!"));
+        commentDetail.setReview(request.getComment());
+        commentDetailRepository.save(commentDetail);
+    }
+
+    @Override
+    public CommentSection findAllByProduct(Long id) {
         // Implement fetching all comments by product ID if needed
-        List<Comment> comments = commentPage.getContent();
+        List<Comment> comments = commentRepository.findAllByProductId(id);
         List<CommentResponse> commentResponses = comments.stream().map(this::getCommentResponse).toList();
+        boolean userIsModerator = userRepository.findById(currentUserId()).get().getRoles().stream().anyMatch(role -> role.getRoleName().equals(RoleName.ADMIN) || role.getRoleName().equals(RoleName.MANAGER));
         return CommentSection.builder()
-                .userComment(findByUserAndProduct(currentUserId(), id))
                 .userCommentExists(commentRepository.existsByUserIdAndProductId(currentUserId(), id))
-                .totalPages(commentPage.getTotalPages())
+                .isModerator(userIsModerator)
                 .comments(commentResponses).build();
     }
 
@@ -159,26 +167,34 @@ public class CommentServiceImpl implements ICommentService {
     @Override
     public CommentResponse getCommentResponse(Comment comment) {
         List<CommentDetailResponse> responseList = commentDetailRepository.findAllByCommentId(comment.getId()).stream().map(this::getCommentDetailResponse).toList();
+        boolean userIsModerator = userRepository.findById(currentUserId()).get().getRoles().stream().anyMatch(role -> role.getRoleName().equals(RoleName.ADMIN) || role.getRoleName().equals(RoleName.MANAGER));
+        boolean commentMadeByCurrentUser = comment.getUser().getId().equals(currentUserId());
         // Map the Comment entity to CommentResponse DTO
-        CommentResponse response = CommentResponse.builder()
+        return CommentResponse.builder()
                 .commentId(comment.getId())
                 .avatar(userRepository.findById(comment.getUser().getId()).get().getAvatar())
                 .username(userRepository.findById(comment.getUser().getId()).get().getUsername())
+                .isModerator(userIsModerator)
+                .madeByCurrentUser(commentMadeByCurrentUser)
                 .createdAt(comment.getCreatedAt())
+                .status(comment.isStatus())
                 .responseList(responseList)
                 .comment(comment.getComment()).build();
-        return response;
     }
 
     @Override
     public CommentDetailResponse getCommentDetailResponse(CommentDetail commentDetail) {
+        boolean userIsModerator = userRepository.findById(currentUserId()).get().getRoles().stream().anyMatch(role -> role.getRoleName().equals(RoleName.ADMIN) || role.getRoleName().equals(RoleName.MANAGER));
+        boolean commentMadeByCurrentUser = commentDetail.getUser().getId().equals(currentUserId());
         // Map the CommentDetail entity to CommentDetailResponse DTO
-        CommentDetailResponse response = CommentDetailResponse.builder()
-                .commentId(commentDetail.getId())
+        return CommentDetailResponse.builder()
+                .commentDetailId(commentDetail.getId())
                 .avatar(userRepository.findById(commentDetail.getUser().getId()).get().getAvatar())
                 .createdAt(commentDetail.getCreatedAt())
                 .review(commentDetail.getReview())
+                .madeByCurrentUser(commentMadeByCurrentUser)
+                .status(commentDetail.isStatus())
+                .isModerator(userIsModerator)
                 .username(userRepository.findById(commentDetail.getUser().getId()).get().getUsername()).build();
-        return response;
     }
 }

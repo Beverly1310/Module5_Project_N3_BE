@@ -19,5 +19,8 @@ public class CommentResponse {
     String avatar;
     String comment;
     LocalDate createdAt;
+    boolean status;
+    boolean isModerator;
+    boolean madeByCurrentUser;
     List<CommentDetailResponse> responseList;
 }

@@ -12,7 +12,9 @@ public interface ICommentService {
     CommentResponse findByUserAndProduct(Long userId,Long productId);
     void addComment(CommentRequest request);
     void addCommentDetail(CommentRequest request);
-    CommentSection findAllByProduct(Long id, int page, int size);
+    void updateComment(CommentRequest request);
+    void updateCommentDetail(CommentRequest request);
+    CommentSection findAllByProduct(Long id);
 
     void toggleDisplayCommentChain(Long commentId);
     void toggleDisplayComment(Long commentId);

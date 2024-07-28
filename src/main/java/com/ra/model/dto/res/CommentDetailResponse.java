@@ -13,10 +13,13 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentDetailResponse {
-    Long commentId;
+    Long commentDetailId;
     String username;
     String avatar;
     String review;
     LocalDate createdAt;
+    boolean status;
+    boolean madeByCurrentUser;
+    boolean isModerator;
 
 }

@@ -23,4 +23,5 @@ public class Message {
     private User user;
     private String message;
     private LocalDate createdAt;
+    private boolean status=false;
 }
