@@ -56,6 +56,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User editUser(UserEdit userEdit) {
         User user = userRepository.findById(getCurrentUser().getId()).orElseThrow(() -> new NoSuchElementException("User not found"));
+        User userExist = userRepository.findUserByEmail(userEdit.getEmail()).orElse(null);
+        if (userExist != null && !Objects.equals(userExist.getId(), getCurrentUser().getId())) {
+            throw new RuntimeException("Email already exists");
+        }
         if (userEdit.getFullName() != null && !userEdit.getFullName().isBlank()) {
             user.setFullName(userEdit.getFullName());
         }
@@ -89,6 +93,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Orders checkOutCart(String couponCode, String note,Long addressId) {
         User user = userRepository.findById(getCurrentUser().getId()).orElseThrow(() -> new NoSuchElementException("User not found"));
         Address address = addressRepository.findById(addressId).orElseThrow(() -> new NoSuchElementException("You do not have contact information yet, please add contact information first."));
@@ -112,14 +117,20 @@ public class UserServiceImpl implements UserService {
                     .status(OrderStatus.WAITING)
                     .streetAddress(address.getStreetAddress())
                     .ward(address.getStreetAddress())
+                    .totalPriceAfterCoupon(0D)
+                    .totalDiscountedPrice(0D)
                     .user(user)
                     .build();
             if (coupon != null) {
-                orders.setCoupon(coupon);
-                orders.setTotalPriceAfterCoupon(totalPrice - totalPrice * (Double.parseDouble(coupon.getDiscount()) / 100));
-                coupon.setQuantity(coupon.getQuantity() - 1);
-                couponRepository.save(coupon);
-
+                if (LocalDate.now().isAfter(coupon.getEndDate())|| LocalDate.now().isBefore(coupon.getStartDate())) {
+                    throw new RuntimeException("Coupon not valid");
+                } else {
+                    orders.setCoupon(coupon);
+                    orders.setTotalPriceAfterCoupon(totalPrice - totalPrice * (Double.parseDouble(coupon.getDiscount()) / 100));
+                    orders.setTotalDiscountedPrice(totalPrice * (Double.parseDouble(coupon.getDiscount()) / 100));
+                    coupon.setQuantity(coupon.getQuantity() - 1);
+                    couponRepository.save(coupon);
+                }
             } else {
                 orders.setCoupon(null);
                 orders.setTotalPriceAfterCoupon(0D);
@@ -134,8 +145,8 @@ public class UserServiceImpl implements UserService {
                     orders.setTotalDiscountedPrice(orders.getTotalPriceAfterCoupon());
                 }
             }
-
             orders.setTotalPrice(totalPrice - orders.getTotalDiscountedPrice());
+            ordersRepository.save(orders);
             for (ShoppingCart shoppingCart : shoppingCarts) {
                 ProductDetail productDetail = productDetailRepository.findById(shoppingCart.getProductDetail().getId()).orElseThrow(() -> new NoSuchElementException("Product type not found"));
                 OrderDetail orderDetail = OrderDetail.builder()
@@ -182,7 +193,11 @@ public class UserServiceImpl implements UserService {
             }).reduce(0.0, Double::sum);
             double totalPriceAfterDiscount = totalPrice;
             if (coupon != null) {
-              totalPriceAfterDiscount = totalPrice - totalPrice * (Double.parseDouble(coupon.getDiscount()) / 100);
+                if (LocalDate.now().isAfter(coupon.getEndDate())|| LocalDate.now().isBefore(coupon.getStartDate())) {
+                    throw new RuntimeException("Coupon is out off date");
+                } else {
+                    totalPriceAfterDiscount = totalPrice - totalPrice * (Double.parseDouble(coupon.getDiscount()) / 100);
+                }
             }
             Optional<Event> event = eventRepository.findByStartDate(LocalDate.now());
             if (event.isPresent()) {

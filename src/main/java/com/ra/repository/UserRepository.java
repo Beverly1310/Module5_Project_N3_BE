@@ -29,4 +29,5 @@ public interface UserRepository extends JpaRepository<User, Long>, PagingAndSort
     @Modifying
     @Query(value = "update user u set u.status = not (u.status) where u.id = :id",nativeQuery = true)
     void updateQueryChangeStatus(@Param("id") Long id);
+    Optional<User> findUserByEmail(String email);
 }
